@@ -26,6 +26,11 @@ namespace UG20260527
             gameControls.GamePlayMap.Enable();
         }
 
+        private void Start()
+        {
+            this.GetSystem<ICameraSystem>().SetTarget(this.transform);
+        }
+
         void OnEnable()
         {
             // 绑定输入
