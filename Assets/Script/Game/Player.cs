@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using QFramework;
 
 
 namespace UG20260527
 {
-    public class Player : MonoBehaviour
+    public class Player : MonoBehaviour, IController
     {
         Rigidbody2D rig2D;
 
@@ -76,9 +77,14 @@ namespace UG20260527
         // 射击输入
         void OnShootStarted(InputAction.CallbackContext context)
         {
-            print("左键");
+            // 发送命令，增加分数
+            //this.SendCommand<AddScoreCommand>();
         }
 
+        public IArchitecture GetArchitecture()
+        {
+            return UnityGame20260527.Interface;
+        }
     }
 }
 

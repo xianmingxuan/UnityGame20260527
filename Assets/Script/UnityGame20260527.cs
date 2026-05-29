@@ -1,0 +1,19 @@
+﻿using QFramework;
+
+namespace UG20260527
+{
+    public class UnityGame20260527 : Architecture<UnityGame20260527>
+    {
+        protected override void Init()
+        {
+            // 系统层
+            RegisterSystem<IScoreSystem>(new ScoreSystem());
+
+            // 数据层
+            RegisterModel<IScoreModel>(new ScoreModel());
+
+            // 工具层
+            RegisterUtility<IStorageUtility>(new StorageUtility());
+        }
+    }
+}
