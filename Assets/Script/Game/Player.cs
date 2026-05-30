@@ -10,34 +10,48 @@ namespace UG20260527
     public class Player : MonoBehaviour, IController
     {
         Rigidbody2D rig2D;
-
-        GameControls gameControls;
         Vector2 moveValue;
         bool isMoveTrigger = false;
+
         [Tooltip("移动速度")]
         public float moveSpeed = 3.0f;
+
 
         void Awake()
         {
             // 刚体引用
             rig2D = GetComponent<Rigidbody2D>();
-            // 输入控制引用（全局唯一）
-            gameControls = new GameControls();
-            gameControls.GamePlayMap.Enable();
         }
 
         private void Start()
         {
+            // 摄像机系统
             this.GetSystem<ICameraSystem>().SetTarget(this.transform);
-        }
 
-        void OnEnable()
-        {
-            // 绑定输入
-            gameControls.GamePlayMap.Move.performed += OnMovePerformed;
-            gameControls.GamePlayMap.Move.canceled += OnMoveCanceled;
-            gameControls.GamePlayMap.Jump.started += OnJumpStarted;
-            gameControls.GamePlayMap.Shoot.started += OnShootStarted;
+            // 输入系统
+            this.GetSystem<IInputSystem>().SwitchActionMap("PlayerMap");
+            this.RegisterEvent<InputActionEvent>(e =>
+            {
+                if (!string.IsNullOrEmpty(e.mapName) && e.mapName == "PlayerMap")
+                {
+                    switch (e.actionName)
+                    {
+                        case "Move":
+                            if (e.context.performed) OnMovePerformed(e.context);
+                            else if (e.context.canceled) OnMoveCanceled(e.context);
+                            break;
+
+                        case "Jump":
+                            if (e.context.started) OnJumpStarted(e.context);
+                            break;
+
+                        case "Shoot":
+                            if (e.context.started) OnShootStarted(e.context);
+                            break;
+                    }
+                }
+            }).UnRegisterWhenGameObjectDestroyed(gameObject);
+
         }
 
         void FixedUpdate()
@@ -46,40 +60,30 @@ namespace UG20260527
             if (isMoveTrigger) rig2D.velocity = new Vector2(moveValue.x * moveSpeed, rig2D.velocity.y);
         }
 
-        void OnDisable()
-        {
-            // 解绑输入
-            gameControls.GamePlayMap.Move.performed -= OnMovePerformed;
-            gameControls.GamePlayMap.Move.canceled -= OnMoveCanceled;
-            gameControls.GamePlayMap.Jump.started -= OnJumpStarted;
-            gameControls.GamePlayMap.Shoot.started -= OnShootStarted;
-        }
 
+        /* ---------------------------------------------------------------- 输入 -------------------------------------------------------- */
 
-        /* ---------------------------------------------------------------- 输入 ------------------------------------------------------ */
-
-        // 移动输入执行时（按下？）
+        // Move按下
         public void OnMovePerformed(InputAction.CallbackContext context)
         {
             isMoveTrigger = true;
             moveValue = context.ReadValue<Vector2>();
-
         }
 
-        // 移动输入取消时（抬起？）
+        // Move抬起
         public void OnMoveCanceled(InputAction.CallbackContext context)
         {
             isMoveTrigger = false;
             moveValue = context.ReadValue<Vector2>();
         }
 
-        // 跳跃输入
+        // Jump按下
         void OnJumpStarted(InputAction.CallbackContext context)
         {
             rig2D.velocity = new Vector2(rig2D.velocity.x, 10f);
         }
 
-        // 射击输入
+        // Shoot按下
         void OnShootStarted(InputAction.CallbackContext context)
         {
             // 发送命令，增加分数

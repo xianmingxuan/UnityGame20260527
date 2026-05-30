@@ -2,7 +2,7 @@
     "name": "GameControls",
     "maps": [
         {
-            "name": "GamePlayMap",
+            "name": "PlayerMap",
             "id": "2d3dcddd-0daf-44b9-af98-41b09407e87d",
             "actions": [
                 {
@@ -108,6 +108,74 @@
                     "processors": "",
                     "groups": "",
                     "action": "Shoot",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "UIMap",
+            "id": "dde1c00d-71cf-426f-b3d6-a3066bd898ec",
+            "actions": [
+                {
+                    "name": "ESC",
+                    "type": "Button",
+                    "id": "54c30831-6464-4fb9-a977-d817133d678d",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "MouseLeftButton",
+                    "type": "Button",
+                    "id": "9970d284-59a1-4f95-945e-5ffa3a18ed0a",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "MouseRightButton",
+                    "type": "Button",
+                    "id": "d47c3bb0-5544-4b91-bdc8-245c7ae618b1",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "5bb07dea-1bef-4a5c-8188-214ab8256a7f",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ESC",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "811bfe04-8e0d-45e2-9efd-20d390ba8aae",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "MouseLeftButton",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d83a85d7-8ff7-4894-9e9b-59a87333aad1",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "MouseRightButton",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

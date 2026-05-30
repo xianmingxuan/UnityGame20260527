@@ -24,7 +24,7 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
     ""name"": ""GameControls"",
     ""maps"": [
         {
-            ""name"": ""GamePlayMap"",
+            ""name"": ""PlayerMap"",
             ""id"": ""2d3dcddd-0daf-44b9-af98-41b09407e87d"",
             ""actions"": [
                 {
@@ -134,6 +134,74 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""UIMap"",
+            ""id"": ""dde1c00d-71cf-426f-b3d6-a3066bd898ec"",
+            ""actions"": [
+                {
+                    ""name"": ""ESC"",
+                    ""type"": ""Button"",
+                    ""id"": ""54c30831-6464-4fb9-a977-d817133d678d"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""MouseLeftButton"",
+                    ""type"": ""Button"",
+                    ""id"": ""9970d284-59a1-4f95-945e-5ffa3a18ed0a"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""MouseRightButton"",
+                    ""type"": ""Button"",
+                    ""id"": ""d47c3bb0-5544-4b91-bdc8-245c7ae618b1"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""5bb07dea-1bef-4a5c-8188-214ab8256a7f"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ESC"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""811bfe04-8e0d-45e2-9efd-20d390ba8aae"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MouseLeftButton"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d83a85d7-8ff7-4894-9e9b-59a87333aad1"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MouseRightButton"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": [
@@ -144,16 +212,22 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
         }
     ]
 }");
-        // GamePlayMap
-        m_GamePlayMap = asset.FindActionMap("GamePlayMap", throwIfNotFound: true);
-        m_GamePlayMap_Move = m_GamePlayMap.FindAction("Move", throwIfNotFound: true);
-        m_GamePlayMap_Jump = m_GamePlayMap.FindAction("Jump", throwIfNotFound: true);
-        m_GamePlayMap_Shoot = m_GamePlayMap.FindAction("Shoot", throwIfNotFound: true);
+        // PlayerMap
+        m_PlayerMap = asset.FindActionMap("PlayerMap", throwIfNotFound: true);
+        m_PlayerMap_Move = m_PlayerMap.FindAction("Move", throwIfNotFound: true);
+        m_PlayerMap_Jump = m_PlayerMap.FindAction("Jump", throwIfNotFound: true);
+        m_PlayerMap_Shoot = m_PlayerMap.FindAction("Shoot", throwIfNotFound: true);
+        // UIMap
+        m_UIMap = asset.FindActionMap("UIMap", throwIfNotFound: true);
+        m_UIMap_ESC = m_UIMap.FindAction("ESC", throwIfNotFound: true);
+        m_UIMap_MouseLeftButton = m_UIMap.FindAction("MouseLeftButton", throwIfNotFound: true);
+        m_UIMap_MouseRightButton = m_UIMap.FindAction("MouseRightButton", throwIfNotFound: true);
     }
 
     ~@GameControls()
     {
-        UnityEngine.Debug.Assert(!m_GamePlayMap.enabled, "This will cause a leak and performance issues, GameControls.GamePlayMap.Disable() has not been called.");
+        UnityEngine.Debug.Assert(!m_PlayerMap.enabled, "This will cause a leak and performance issues, GameControls.PlayerMap.Disable() has not been called.");
+        UnityEngine.Debug.Assert(!m_UIMap.enabled, "This will cause a leak and performance issues, GameControls.UIMap.Disable() has not been called.");
     }
 
     public void Dispose()
@@ -212,28 +286,28 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
         return asset.FindBinding(bindingMask, out action);
     }
 
-    // GamePlayMap
-    private readonly InputActionMap m_GamePlayMap;
-    private List<IGamePlayMapActions> m_GamePlayMapActionsCallbackInterfaces = new List<IGamePlayMapActions>();
-    private readonly InputAction m_GamePlayMap_Move;
-    private readonly InputAction m_GamePlayMap_Jump;
-    private readonly InputAction m_GamePlayMap_Shoot;
-    public struct GamePlayMapActions
+    // PlayerMap
+    private readonly InputActionMap m_PlayerMap;
+    private List<IPlayerMapActions> m_PlayerMapActionsCallbackInterfaces = new List<IPlayerMapActions>();
+    private readonly InputAction m_PlayerMap_Move;
+    private readonly InputAction m_PlayerMap_Jump;
+    private readonly InputAction m_PlayerMap_Shoot;
+    public struct PlayerMapActions
     {
         private @GameControls m_Wrapper;
-        public GamePlayMapActions(@GameControls wrapper) { m_Wrapper = wrapper; }
-        public InputAction @Move => m_Wrapper.m_GamePlayMap_Move;
-        public InputAction @Jump => m_Wrapper.m_GamePlayMap_Jump;
-        public InputAction @Shoot => m_Wrapper.m_GamePlayMap_Shoot;
-        public InputActionMap Get() { return m_Wrapper.m_GamePlayMap; }
+        public PlayerMapActions(@GameControls wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Move => m_Wrapper.m_PlayerMap_Move;
+        public InputAction @Jump => m_Wrapper.m_PlayerMap_Jump;
+        public InputAction @Shoot => m_Wrapper.m_PlayerMap_Shoot;
+        public InputActionMap Get() { return m_Wrapper.m_PlayerMap; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
         public bool enabled => Get().enabled;
-        public static implicit operator InputActionMap(GamePlayMapActions set) { return set.Get(); }
-        public void AddCallbacks(IGamePlayMapActions instance)
+        public static implicit operator InputActionMap(PlayerMapActions set) { return set.Get(); }
+        public void AddCallbacks(IPlayerMapActions instance)
         {
-            if (instance == null || m_Wrapper.m_GamePlayMapActionsCallbackInterfaces.Contains(instance)) return;
-            m_Wrapper.m_GamePlayMapActionsCallbackInterfaces.Add(instance);
+            if (instance == null || m_Wrapper.m_PlayerMapActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_PlayerMapActionsCallbackInterfaces.Add(instance);
             @Move.started += instance.OnMove;
             @Move.performed += instance.OnMove;
             @Move.canceled += instance.OnMove;
@@ -245,7 +319,7 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
             @Shoot.canceled += instance.OnShoot;
         }
 
-        private void UnregisterCallbacks(IGamePlayMapActions instance)
+        private void UnregisterCallbacks(IPlayerMapActions instance)
         {
             @Move.started -= instance.OnMove;
             @Move.performed -= instance.OnMove;
@@ -258,21 +332,83 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
             @Shoot.canceled -= instance.OnShoot;
         }
 
-        public void RemoveCallbacks(IGamePlayMapActions instance)
+        public void RemoveCallbacks(IPlayerMapActions instance)
         {
-            if (m_Wrapper.m_GamePlayMapActionsCallbackInterfaces.Remove(instance))
+            if (m_Wrapper.m_PlayerMapActionsCallbackInterfaces.Remove(instance))
                 UnregisterCallbacks(instance);
         }
 
-        public void SetCallbacks(IGamePlayMapActions instance)
+        public void SetCallbacks(IPlayerMapActions instance)
         {
-            foreach (var item in m_Wrapper.m_GamePlayMapActionsCallbackInterfaces)
+            foreach (var item in m_Wrapper.m_PlayerMapActionsCallbackInterfaces)
                 UnregisterCallbacks(item);
-            m_Wrapper.m_GamePlayMapActionsCallbackInterfaces.Clear();
+            m_Wrapper.m_PlayerMapActionsCallbackInterfaces.Clear();
             AddCallbacks(instance);
         }
     }
-    public GamePlayMapActions @GamePlayMap => new GamePlayMapActions(this);
+    public PlayerMapActions @PlayerMap => new PlayerMapActions(this);
+
+    // UIMap
+    private readonly InputActionMap m_UIMap;
+    private List<IUIMapActions> m_UIMapActionsCallbackInterfaces = new List<IUIMapActions>();
+    private readonly InputAction m_UIMap_ESC;
+    private readonly InputAction m_UIMap_MouseLeftButton;
+    private readonly InputAction m_UIMap_MouseRightButton;
+    public struct UIMapActions
+    {
+        private @GameControls m_Wrapper;
+        public UIMapActions(@GameControls wrapper) { m_Wrapper = wrapper; }
+        public InputAction @ESC => m_Wrapper.m_UIMap_ESC;
+        public InputAction @MouseLeftButton => m_Wrapper.m_UIMap_MouseLeftButton;
+        public InputAction @MouseRightButton => m_Wrapper.m_UIMap_MouseRightButton;
+        public InputActionMap Get() { return m_Wrapper.m_UIMap; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(UIMapActions set) { return set.Get(); }
+        public void AddCallbacks(IUIMapActions instance)
+        {
+            if (instance == null || m_Wrapper.m_UIMapActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_UIMapActionsCallbackInterfaces.Add(instance);
+            @ESC.started += instance.OnESC;
+            @ESC.performed += instance.OnESC;
+            @ESC.canceled += instance.OnESC;
+            @MouseLeftButton.started += instance.OnMouseLeftButton;
+            @MouseLeftButton.performed += instance.OnMouseLeftButton;
+            @MouseLeftButton.canceled += instance.OnMouseLeftButton;
+            @MouseRightButton.started += instance.OnMouseRightButton;
+            @MouseRightButton.performed += instance.OnMouseRightButton;
+            @MouseRightButton.canceled += instance.OnMouseRightButton;
+        }
+
+        private void UnregisterCallbacks(IUIMapActions instance)
+        {
+            @ESC.started -= instance.OnESC;
+            @ESC.performed -= instance.OnESC;
+            @ESC.canceled -= instance.OnESC;
+            @MouseLeftButton.started -= instance.OnMouseLeftButton;
+            @MouseLeftButton.performed -= instance.OnMouseLeftButton;
+            @MouseLeftButton.canceled -= instance.OnMouseLeftButton;
+            @MouseRightButton.started -= instance.OnMouseRightButton;
+            @MouseRightButton.performed -= instance.OnMouseRightButton;
+            @MouseRightButton.canceled -= instance.OnMouseRightButton;
+        }
+
+        public void RemoveCallbacks(IUIMapActions instance)
+        {
+            if (m_Wrapper.m_UIMapActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(IUIMapActions instance)
+        {
+            foreach (var item in m_Wrapper.m_UIMapActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_UIMapActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public UIMapActions @UIMap => new UIMapActions(this);
     private int m_KeyboardSchemeIndex = -1;
     public InputControlScheme KeyboardScheme
     {
@@ -282,10 +418,16 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
             return asset.controlSchemes[m_KeyboardSchemeIndex];
         }
     }
-    public interface IGamePlayMapActions
+    public interface IPlayerMapActions
     {
         void OnMove(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
         void OnShoot(InputAction.CallbackContext context);
+    }
+    public interface IUIMapActions
+    {
+        void OnESC(InputAction.CallbackContext context);
+        void OnMouseLeftButton(InputAction.CallbackContext context);
+        void OnMouseRightButton(InputAction.CallbackContext context);
     }
 }
