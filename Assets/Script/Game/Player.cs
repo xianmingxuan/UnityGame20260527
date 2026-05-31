@@ -1,26 +1,38 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using QFramework;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using QFramework;
+using Color = UnityEngine.Color;
 
 
 namespace UG20260527
 {
     public class Player : MonoBehaviour, IController
     {
-        Rigidbody2D rig2D;
-        Vector2 moveValue;
-        bool isMoveTrigger = false;
+        /* ---------------------------------------------------------------- 属性 -------------------------------------------------------- */
 
-        [Tooltip("移动速度")]
-        public float moveSpeed = 3.0f;
+        // Physics
+        private Rigidbody2D Rig2D;
+        private BoxCollider2D BoxCollider2D;
 
+        // Move
+        private float MoveSpeed = 3.0f;  // 移动速度
+        private float AccSpeed = 0.7f;  // 加速度
+        private float DecSpeed = 0.15f;  // 减速度
+        private Vector2 MoveInputValue;
+        private bool IsMoveInput = false;
+
+        // Jump
+        private bool IsJumpInput = false;
+        private float JumpForce = 10f;
+
+
+        /* ---------------------------------------------------------------- 生命周期 -------------------------------------------------------- */
 
         void Awake()
         {
-            // 刚体引用
-            rig2D = GetComponent<Rigidbody2D>();
+            // 初始化自身引用
+            Rig2D = GetComponent<Rigidbody2D>();
+            BoxCollider2D = GetComponentInChildren<BoxCollider2D>();
         }
 
         private void Start()
@@ -54,10 +66,33 @@ namespace UG20260527
 
         }
 
+        // 物理帧更新 缓存
+        Vector2 LastFixedVelocity;  // 上一个物理帧速度
+
         void FixedUpdate()
         {
-            // 移动输入
-            if (isMoveTrigger) rig2D.velocity = new Vector2(moveValue.x * moveSpeed, rig2D.velocity.y);
+            // Move
+            if (IsMoveInput)
+            {
+                // 加速度
+                LastFixedVelocity.x = Mathf.Clamp(LastFixedVelocity.x + MoveInputValue.x * AccSpeed, -MoveSpeed, MoveSpeed);
+                float x = Time.fixedDeltaTime * LastFixedVelocity.x;
+                transform.position = new Vector3(transform.position.x + x, transform.position.y, transform.position.z);
+            }
+            else
+            {
+                // 减速度
+                LastFixedVelocity.x = Mathf.MoveTowards(LastFixedVelocity.x, 0, DecSpeed);
+                float x = Time.fixedDeltaTime * LastFixedVelocity.x;
+                transform.position = new Vector3(transform.position.x + x, transform.position.y, transform.position.z);
+            }
+
+            // Jump
+            if (IsJumpInput)
+            {
+                IsJumpInput = false;
+                Rig2D.velocity = new Vector2(Rig2D.velocity.x, JumpForce);
+            }
         }
 
 
@@ -66,21 +101,33 @@ namespace UG20260527
         // Move按下
         public void OnMovePerformed(InputAction.CallbackContext context)
         {
-            isMoveTrigger = true;
-            moveValue = context.ReadValue<Vector2>();
+            IsMoveInput = true;
+            MoveInputValue = context.ReadValue<Vector2>();
         }
 
         // Move抬起
         public void OnMoveCanceled(InputAction.CallbackContext context)
         {
-            isMoveTrigger = false;
-            moveValue = context.ReadValue<Vector2>();
+            IsMoveInput = false;
+            MoveInputValue = context.ReadValue<Vector2>();
         }
 
         // Jump按下
         void OnJumpStarted(InputAction.CallbackContext context)
         {
-            rig2D.velocity = new Vector2(rig2D.velocity.x, 10f);
+            // 检测是否在地面上
+            Vector2 point = (Vector2)transform.position + Vector2.down * BoxCollider2D.size.y;
+            if (Physics2D.OverlapBox(point, BoxCollider2D.size, 0f, LayerMask.GetMask("Ground")))
+            {
+                IsJumpInput = true;
+            }
+        }
+
+        // 调试
+        private void OnDrawGizmosSelected()
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireCube((Vector2)transform.position + Vector2.down * BoxCollider2D.size.y, BoxCollider2D.size);
         }
 
         // Shoot按下
@@ -89,6 +136,10 @@ namespace UG20260527
             // 发送命令，增加分数
             //this.SendCommand<AddScoreCommand>();
         }
+
+
+
+        /* ---------------------------------------------------------------- QFramework -------------------------------------------------------- */
 
         public IArchitecture GetArchitecture()
         {
