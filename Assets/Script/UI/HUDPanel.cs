@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace UG20260527
 {
-    public class HUDPanel : MonoBehaviour, IController
+    public class HUDPanel : PanelBase
     {
         public Text ScoreText;
         public Button BtnAdd;
@@ -14,8 +14,16 @@ namespace UG20260527
 
         private IScoreModel mScoreModel;
 
-        private void Start()
+        public override void OnEnter()
         {
+            base.OnEnter();
+
+            // 初始化 子UI组件
+            ScoreText = GetComponentInChildren<Text>("ScoreText");
+            AchievementDisplayText = GetComponentInChildren<Text>("AchievementDisplayText");
+            BtnAdd = GetComponentInChildren<Button>("BtnAdd");
+            BtnSub = GetComponentInChildren<Button>("BtnSub");
+
             // 获取 分数数据模型
             mScoreModel = this.GetModel<IScoreModel>();
 
@@ -26,7 +34,7 @@ namespace UG20260527
                 this.SendCommand<AddScoreCommand>();
             });
 
-            BtnSub.onClick.AddListener(() => 
+            BtnSub.onClick.AddListener(() =>
             {
                 // 发送命令：减少分数
                 this.SendCommand<SubScoreCommand>();
@@ -34,11 +42,11 @@ namespace UG20260527
 
             // 表现逻辑：监听分数变化，更新UI
             mScoreModel.Score.RegisterWithInitValue(value => UpdateScoreText(value))
-                .UnRegisterWhenGameObjectDestroyed(gameObject);
+                .UnRegisterWhenGameObjectDestroyed(panelGameObject);
 
             // 成就表现
             this.RegisterEvent<AchievementDisplayEvent>(e => AchievementDisplay(e.DisplayText))
-                .UnRegisterWhenGameObjectDestroyed(gameObject);
+                .UnRegisterWhenGameObjectDestroyed(panelGameObject);
         }
 
         // 更新 分数显示

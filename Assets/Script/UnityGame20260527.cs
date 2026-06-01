@@ -10,6 +10,7 @@ namespace UG20260527
             RegisterSystem<IScoreSystem>(new ScoreSystem());
             RegisterSystem<ICameraSystem>(new CameraSystem());
             RegisterSystem<IInputSystem>(new InputSystem());
+            RegisterSystem<IUISystem>(new UISystem());
 
             // 数据层
             RegisterModel<IScoreModel>(new ScoreModel());

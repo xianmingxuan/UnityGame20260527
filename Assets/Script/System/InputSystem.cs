@@ -82,7 +82,7 @@ namespace UG20260527
         {
 
             // 查找Asset中是否存在mapName
-            var targetMap = GameControls.asset.FindActionMap(mapName);
+            InputActionMap targetMap = GameControls.asset.FindActionMap(mapName);
             if(targetMap == null)
             {
                 Debug.LogWarning($"{mapName} 不存在 InputSystem配置中");

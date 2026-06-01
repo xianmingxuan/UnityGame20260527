@@ -1,4 +1,5 @@
 ﻿using QFramework;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Color = UnityEngine.Color;
@@ -35,7 +36,7 @@ namespace UG20260527
             BoxCollider2D = GetComponentInChildren<BoxCollider2D>();
         }
 
-        private void Start()
+        private async void Start()
         {
             // 摄像机系统
             this.GetSystem<ICameraSystem>().SetTarget(this.transform);
@@ -64,6 +65,10 @@ namespace UG20260527
                 }
             }).UnRegisterWhenGameObjectDestroyed(gameObject);
 
+            // 测试
+            await this.GetSystem<IUISystem>().PushPanel(new HUDPanel());
+            await Task.Delay(7000);
+            await this.GetSystem<IUISystem>().PushPanel(new TestPanel());
         }
 
         // 物理帧更新 缓存
