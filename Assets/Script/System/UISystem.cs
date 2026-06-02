@@ -11,7 +11,7 @@ namespace UG20260527
 
     public interface IUISystem : ISystem
     {
-        public Task<GameObject> PushPanel(PanelBase panelScript);
+        public Task<T> PushPanel<T>() where T : PanelBase, new();
         public void PopPanel();
     }
 
@@ -82,20 +82,21 @@ namespace UG20260527
 
         /* -------------------------------------------------- 接口函数 -------------------------------------------------- */
 
-        public async Task<GameObject> PushPanel(PanelBase panelScript)
+        public async Task<T> PushPanel<T>() where T : PanelBase, new()
         {
             // 创建Panel
+            T panelScript = new T();
             GameObject panel = await GetPanel(panelScript);
-            if(panel == null) return null;
+            if (panel == null) return null;
 
             // 冻结栈顶
-            if(panelStack.Count > 0) panelStack.Peek().OnPause();
+            if (panelStack.Count > 0) panelStack.Peek().OnPause();
 
             // 入栈 并 启用
             panelStack.Push(panelScript);
             panelScript.OnEnter();
 
-            return panel;
+            return panelScript;
         }
 
         void IUISystem.PopPanel()
@@ -203,6 +204,7 @@ namespace UG20260527
             return panelGameObject.GetComponent<T>();
         }
 
+        // 获取 子对象
         public GameObject GetGameObjectInChildren(string name)
         {
             var trans = panelGameObject.GetComponentsInChildren<Transform>();
@@ -213,12 +215,55 @@ namespace UG20260527
             return null;
         }
 
+        public GameObject GetGameObjectInChildren(GameObject parentObj, string name)
+        {
+            var trans = parentObj.GetComponentsInChildren<Transform>();
+            foreach (var item in trans)
+            {
+                if (item.name == name) return item.gameObject;
+            }
+            return null;
+        }
+
+        // 获取 子对象 的 子组件脚本
         public T GetComponentInChildren<T>(string name) where T : Component
         {
             GameObject obj = GetGameObjectInChildren(name);
             if (obj == null) return null;
 
             return obj.GetComponent<T>();
+        }
+
+        public T GetComponentInChildren<T>(string name, out T comp) where T : Component
+        {
+            GameObject obj = GetGameObjectInChildren(name);
+            if (obj == null)
+            {
+                comp = null;
+                return null;
+            }
+            comp = obj.GetComponent<T>();
+            return comp;
+        }
+
+        public T GetComponentInChildren<T>(GameObject parentObj, string name) where T : Component
+        {
+            GameObject obj = GetGameObjectInChildren(parentObj, name);
+            if (obj == null) return null;
+
+            return obj.GetComponent<T>();
+        }
+
+        public T GetComponentInChildren<T>(GameObject parentObj, string name, out T comp) where T : Component
+        {
+            GameObject obj = GetGameObjectInChildren(parentObj, name);
+            if (obj == null)
+            {
+                comp = null;
+                return null;
+            }
+            comp = obj.GetComponent<T>();
+            return comp;
         }
 
 
