@@ -42,11 +42,11 @@ namespace UG20260527
 
             // 表现逻辑：监听分数变化，更新UI
             mScoreModel.Score.RegisterWithInitValue(value => UpdateScoreText(value))
-                .UnRegisterWhenGameObjectDestroyed(panelGameObject);
+                .UnRegisterWhenGameObjectDestroyed(gameObject);
 
             // 成就表现
             this.RegisterEvent<AchievementDisplayEvent>(e => AchievementDisplay(e.DisplayText))
-                .UnRegisterWhenGameObjectDestroyed(panelGameObject);
+                .UnRegisterWhenGameObjectDestroyed(gameObject);
         }
 
         // 更新 分数显示

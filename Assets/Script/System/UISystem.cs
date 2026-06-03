@@ -11,7 +11,7 @@ namespace UG20260527
 
     public interface IUISystem : ISystem
     {
-        public Task<T> PushPanel<T>() where T : PanelBase, new();
+        public Task<T> PushPanel<T>() where T : PanelBase;
         public void PopPanel();
     }
 
@@ -20,11 +20,11 @@ namespace UG20260527
         /* -------------------------------------------------- 属性 -------------------------------------------------- */
 
         // Panel 配置表
-        private string panelConfigPath = "Assets/Config/PanelConfig.asset";
-        public PanelConfig panelConfig;
+        private string uiConfigPath = "Assets/Config/UIConfig.asset";
+        public UIConfig uiConfig;
 
         // UI栈
-        public Stack<PanelBase> panelStack = new Stack<PanelBase>();
+        public Stack<PanelBase> panelStack;
 
         // 画布面板
         public Transform parentCanvas;
@@ -32,62 +32,67 @@ namespace UG20260527
 
         protected override void OnInit()
         {
+            panelStack = new Stack<PanelBase>();
             // 获取 画布面板
             var obj = GameObject.Find("Canvas");
-            if(obj == null) Debug.LogWarning("场景中没有 Canvas画布");
+            if (obj == null) Debug.LogWarning("场景中没有 Canvas画布");
             else parentCanvas = obj.transform;
         }
 
         /* -------------------------------------------------- 内部API函数 -------------------------------------------------- */
 
-        private async Task<AssetReference> GetPanelAssetRef(string panelName)
+        // 加载 UI配置表
+        private async Task LoadUIConfig()
         {
-            if(panelConfig == null)
+            // 加载 Panel配置表
+            uiConfig = await Addressables.LoadAssetAsync<UIConfig>(uiConfigPath).Task;
+        }
+
+        // 根据Type 获取Panel预制体AssetRef
+        private async Task<AssetReference> GetPanelAssetRef<T>() where T : PanelBase
+        {
+            if (uiConfig == null)
             {
-                await LoadPanelConfig();
+                await LoadUIConfig();
             }
 
-            if(!panelConfig.panelAssetRefDic.ContainsKey(panelName))
+            if (!uiConfig.panelConfigDic.ContainsKey(typeof(T)))
             {
-                Debug.LogWarning($"{panelConfig.name} 配置表中没有 {panelName} 资源");
+                Debug.LogWarning($"{uiConfig.name} 配置表中没有 {typeof(T).Name} 资源");
                 return null;
             }
 
-            return panelConfig.panelAssetRefDic[panelName];
+            return uiConfig.panelConfigDic[typeof(T)].panelAssetRef;
         }
-
-        private async Task LoadPanelConfig()
+        
+        // 根据Type 实例化Panel和脚本
+        private async Task<GameObject> GetPanel<T>() where T : PanelBase
         {
-            // 加载 Panel配置表
-            panelConfig = await Addressables.LoadAssetAsync<PanelConfig>(panelConfigPath).Task;
-        }
+            // 获取Panel资源
+            AssetReference panelAssetRef = await GetPanelAssetRef<T>();
+            if(panelAssetRef == null) return null;
 
-        // 加载并显示Panel
-        private async Task<GameObject> GetPanel(PanelBase panelScript)
-        {
-            // 加载 资源引用
-            var panelRef = await GetPanelAssetRef(panelScript.GetType().Name);
-            if (panelRef == null) return null;
-
-            // 加载 panelGameObject
-            var panel = await panelRef.InstantiateAsync(parentCanvas, false).Task;
-
-            // 初始化脚本变量
-            panelScript.panelRef = panelRef;
-            panelScript.panelGameObject = panel;
-            panelScript.parentCanvas = parentCanvas;
+            // 实例化Panel
+            var panel = await panelAssetRef.InstantiateAsync(parentCanvas, false).Task;
 
             return panel;
         }
 
+
         /* -------------------------------------------------- 接口函数 -------------------------------------------------- */
 
-        public async Task<T> PushPanel<T>() where T : PanelBase, new()
+        async Task<T> IUISystem.PushPanel<T>()
         {
             // 创建Panel
-            T panelScript = new T();
-            GameObject panel = await GetPanel(panelScript);
-            if (panel == null) return null;
+            GameObject panel = await GetPanel<T>();
+            if (panel == null)
+            {
+                return null;
+            }
+
+            // 添加 控制脚本
+            T panelScript = panel.GetComponent<T>();
+            if(panelScript == null) panelScript = panel.AddComponent<T>();
 
             // 冻结栈顶
             if (panelStack.Count > 0) panelStack.Peek().OnPause();
@@ -101,12 +106,12 @@ namespace UG20260527
 
         void IUISystem.PopPanel()
         {
-            if(panelStack.Count <= 0) return;
+            if (panelStack.Count <= 0) return;
 
             panelStack.Peek().OnExit();
             panelStack.Pop();
 
-            if(panelStack.Count > 0) panelStack.Peek().OnResume();
+            if (panelStack.Count > 0) panelStack.Peek().OnResume();
         }
     }
 
@@ -117,23 +122,8 @@ namespace UG20260527
     /// <summary>
     /// Panel基类
     /// </summary>
-    public abstract class PanelBase : IController
+    public abstract class PanelBase : MonoBehaviour, IController
     {
-        /// <summary>
-        /// Panel资源引用
-        /// </summary>
-        public AssetReference panelRef;
-
-        /// <summary>
-        /// 面板自身GameObject引用
-        /// </summary>
-        public GameObject panelGameObject;
-
-        /// <summary>
-        /// 画布引用
-        /// </summary>
-        public Transform parentCanvas;
-
         /// <summary>
         /// Panel控制组件
         /// </summary>
@@ -145,10 +135,11 @@ namespace UG20260527
         /// <summary>
         /// Panel显示时
         /// </summary>
-        public virtual void OnEnter() 
+        public virtual void OnEnter()
         {
             // Panel控制
-            canvasGroup = GetOrAddComponent<CanvasGroup>();
+            canvasGroup = gameObject.GetComponent<CanvasGroup>();
+            if (canvasGroup  == null) canvasGroup = gameObject.AddComponent<CanvasGroup>();
             canvasGroup.blocksRaycasts = true;
             canvasGroup.interactable = true;
             canvasGroup.alpha = 1.0f;
@@ -157,7 +148,7 @@ namespace UG20260527
         /// <summary>
         /// panel冻结时
         /// </summary>
-        public virtual void OnPause() 
+        public virtual void OnPause()
         {
             canvasGroup.blocksRaycasts = false;
             canvasGroup.interactable = false;
@@ -167,7 +158,7 @@ namespace UG20260527
         /// <summary>
         /// Panel恢复时
         /// </summary>
-        public virtual void OnResume() 
+        public virtual void OnResume()
         {
             canvasGroup.blocksRaycasts = true;
             canvasGroup.interactable = true;
@@ -177,38 +168,19 @@ namespace UG20260527
         /// <summary>
         /// panel销毁时
         /// </summary>
-        public virtual void OnExit() 
+        public virtual void OnExit()
         {
-            GameObject.Destroy(panelGameObject);
+            GameObject.Destroy(gameObject);
         }
 
 
         /* ----------------------------------------- API -------------------------------------------- */
 
-        public T GetComponent<T>() where T : Component
-        {
-            return panelGameObject.GetComponent<T>();
-        }
-
-        public T AddComponent<T>() where T : Component
-        {
-            return panelGameObject.AddComponent<T>();
-        }
-
-        public T GetOrAddComponent<T>() where T : Component
-        {
-            T comp = panelGameObject.GetComponent<T>();
-            if (comp) return comp;
-
-            panelGameObject.AddComponent<T>();
-            return panelGameObject.GetComponent<T>();
-        }
-
         // 获取 子对象
         public GameObject GetGameObjectInChildren(string name)
         {
-            var trans = panelGameObject.GetComponentsInChildren<Transform>();
-            foreach(var item in trans)
+            var trans = gameObject.GetComponentsInChildren<Transform>();
+            foreach (var item in trans)
             {
                 if (item.name == name) return item.gameObject;
             }

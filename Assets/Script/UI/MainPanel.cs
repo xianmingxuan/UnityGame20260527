@@ -20,11 +20,19 @@ namespace UG20260527
             Toggle toggle_BeginPlay;
             GetComponentInChildren<Toggle>("Toggle_BeginPlay", out toggle_BeginPlay).onValueChanged.AddListener(IsOn =>
             {
-                if (!IsOn) toggle_BeginPlay.interactable = true;
+                //Debug.Log($"页面改变 {GetComponentInChildren<Text>(toggle_BeginPlay.gameObject, "Label").text}");
+
+                if (!IsOn)
+                {
+                    toggle_BeginPlay.interactable = true;
+                    Debug.Log($"取消选择页面 {GetComponentInChildren<Text>(toggle_BeginPlay.gameObject, "Label").text}");
+                    this.GetSystem<IUISystem>().PopPanel();
+                }
                 else
                 {
                     toggle_BeginPlay.interactable = false;
                     Debug.Log($"切换到页面 {GetComponentInChildren<Text>(toggle_BeginPlay.gameObject, "Label").text}");
+                    this.GetSystem<IUISystem>().PushPanel<BeginGamePanel>();
                 }
             });
 
@@ -56,25 +64,29 @@ namespace UG20260527
                 Debug.Log($"点击 {GetComponentInChildren<Text>(btn_Setting.gameObject, "Text").text}");
             });
 
-
-
-            // 初始化 开始页面
-            SetToggleGroup(0);
-
+            InitToggleGroup(1);
         }
 
 
         /* -------------------------------------------------- 初始化（多态） -------------------------------------------------- */
 
         // 设置初始页面
-        public MainPanel SetToggleGroup(int index)
+        public MainPanel InitToggleGroup(int index)
         {
+            // 所有页面取消选择
             var toggleGroup = GetComponentInChildren<ToggleGroup>("ToggleGroup");
-            toggleGroup.SetAllTogglesOff();
             Toggle[] arr = toggleGroup.GetComponentsInChildren<Toggle>();
+            foreach( Toggle toggle in arr )
+            {
+                toggle.isOn = false;
+            }
+
+            // 单独打开index页面
             if (arr.Length <= index) return this;
             arr[index].isOn = true;
             arr[index].Select();
+            arr[index].interactable = false;
+
             return this;
         }
     }

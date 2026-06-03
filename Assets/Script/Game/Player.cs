@@ -65,10 +65,6 @@ namespace UG20260527
                 }
             }).UnRegisterWhenGameObjectDestroyed(gameObject);
 
-            // 测试
-            //await this.GetSystem<IUISystem>().PushPanel(new HUDPanel());
-            //await Task.Delay(7000);
-            //await this.GetSystem<IUISystem>().PushPanel(new TestPanel());
         }
 
         // 物理帧更新 缓存

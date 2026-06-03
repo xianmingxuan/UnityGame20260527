@@ -11,8 +11,7 @@ namespace UG20260527
         private async void Start()
         {
             // MainPanel
-            var mainPanelSC = await this.GetSystem<IUISystem>().PushPanel<MainPanel>();
-            mainPanelSC.SetToggleGroup(1);
+            var panelSC = await this.GetSystem<IUISystem>().PushPanel<MainPanel>();
         }
 
 
