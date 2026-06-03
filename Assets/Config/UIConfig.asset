@@ -25,3 +25,15 @@ MonoBehaviour:
       m_SubObjectName: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
+  - panelScript: {fileID: 11500000, guid: 97e95b463e1e9694e8afce45bc8c7e52, type: 3}
+    panelAssetRef:
+      m_AssetGUID: af55ed16c69796b4a800a3ed2176dd4e
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+  - panelScript: {fileID: 11500000, guid: b51b9693df5f4054ba4e30248237e5e1, type: 3}
+    panelAssetRef:
+      m_AssetGUID: afa5ace141c57ce4db6ea9fb3e0ff165
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0

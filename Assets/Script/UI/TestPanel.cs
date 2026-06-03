@@ -6,13 +6,14 @@ namespace UG20260527
 {
     public class TestPanel : PanelBase
     {
-        public override void OnEnter()
+        public override void OnOpen()
         {
-            base.OnEnter();
+            base.OnOpen();
 
             GetComponentInChildren<Button>("BtnTest").onClick.AddListener(() =>
             {
-                Debug.Log("点击");
+                Debug.Log("点击测试面板");
+                this.GetSystem<IUISystem>().CloseSinglePanel();
             });
         }
     }

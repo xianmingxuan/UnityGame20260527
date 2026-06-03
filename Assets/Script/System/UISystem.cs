@@ -1,4 +1,6 @@
-﻿using QFramework;
+﻿using Cysharp.Threading.Tasks;
+using QFramework;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -11,8 +13,8 @@ namespace UG20260527
 
     public interface IUISystem : ISystem
     {
-        public Task<T> PushPanel<T>() where T : PanelBase;
-        public void PopPanel();
+        public UniTask<T> OpenSinglePanel<T>(Action<T> onInit = null, bool isPushStack = true) where T : PanelBase;
+        public UniTask CloseSinglePanel(PanelBase panelSC = null);
     }
 
     public class UISystem : AbstractSystem, IUISystem
@@ -25,6 +27,8 @@ namespace UG20260527
 
         // UI栈
         public Stack<PanelBase> panelStack;
+        // 正在加载 准备入栈的Panel数量
+        public BindableProperty<int> pushingPanelCount { get; } = new BindableProperty<int>(0);
 
         // 画布面板
         public Transform parentCanvas;
@@ -37,19 +41,25 @@ namespace UG20260527
             var obj = GameObject.Find("Canvas");
             if (obj == null) Debug.LogWarning("场景中没有 Canvas画布");
             else parentCanvas = obj.transform;
+
+            // 加载中Panel数量
+            pushingPanelCount.Register(value =>
+            {
+                if (value < 0) pushingPanelCount.Value = 0;
+            });
         }
 
-        /* -------------------------------------------------- 内部API函数 -------------------------------------------------- */
+        /* -------------------------------------------------- API函数 -------------------------------------------------- */
 
         // 加载 UI配置表
-        private async Task LoadUIConfig()
+        private async UniTask LoadUIConfig()
         {
             // 加载 Panel配置表
             uiConfig = await Addressables.LoadAssetAsync<UIConfig>(uiConfigPath).Task;
         }
 
         // 根据Type 获取Panel预制体AssetRef
-        private async Task<AssetReference> GetPanelAssetRef<T>() where T : PanelBase
+        private async UniTask<AssetReference> GetPanelAssetRef<T>() where T : PanelBase
         {
             if (uiConfig == null)
             {
@@ -66,7 +76,7 @@ namespace UG20260527
         }
         
         // 根据Type 实例化Panel和脚本
-        private async Task<GameObject> GetPanel<T>() where T : PanelBase
+        private async UniTask<T> CreatePanel<T>(Action<T> onInit) where T : PanelBase
         {
             // 获取Panel资源
             AssetReference panelAssetRef = await GetPanelAssetRef<T>();
@@ -75,40 +85,64 @@ namespace UG20260527
             // 实例化Panel
             var panel = await panelAssetRef.InstantiateAsync(parentCanvas, false).Task;
 
-            return panel;
+            // 添加 控制脚本
+            T panelScript = panel.GetComponent<T>();
+            if (panelScript == null) panelScript = panel.AddComponent<T>();
+            await panelScript.OnInit(onInit);
+
+            return panelScript;
         }
 
 
         /* -------------------------------------------------- 接口函数 -------------------------------------------------- */
 
-        async Task<T> IUISystem.PushPanel<T>()
+        async UniTask<T> IUISystem.OpenSinglePanel<T>(Action<T> onInit, bool isPushStack)
         {
-            // 创建Panel
-            GameObject panel = await GetPanel<T>();
-            if (panel == null)
+            // 不入栈（由创建者自己管理，例如：子面板）
+            if(!isPushStack)
             {
-                return null;
+                T panelSC = await CreatePanel<T>(onInit);
+                panelSC.OnOpen();
+                return panelSC;
             }
 
-            // 添加 控制脚本
-            T panelScript = panel.GetComponent<T>();
-            if(panelScript == null) panelScript = panel.AddComponent<T>();
+            // 加载中Panel++
+            pushingPanelCount.Value++;
+
+            // 创建Panel
+            T panelScript = await CreatePanel<T>(onInit);
+            if (panelScript == null)
+            {
+                // 加载中Panel--
+                pushingPanelCount.Value--;
+                return null;
+            }
 
             // 冻结栈顶
             if (panelStack.Count > 0) panelStack.Peek().OnPause();
 
             // 入栈 并 启用
             panelStack.Push(panelScript);
-            panelScript.OnEnter();
+            panelScript.OnOpen();
 
+            // 加载中Panel--
+            pushingPanelCount.Value--;
             return panelScript;
         }
 
-        void IUISystem.PopPanel()
+        async UniTask IUISystem.CloseSinglePanel(PanelBase panelSC)
         {
-            if (panelStack.Count <= 0) return;
+            if(panelSC != null)
+            {
+                panelSC.OnClose();
+                return;
+            }
 
-            panelStack.Peek().OnExit();
+            // 先等其它 push任务 完成
+            if(pushingPanelCount.Value > 0) await UniTask.WaitUntil(() => pushingPanelCount.Value <= 0);
+            if (panelStack.Count <= 0) return;
+            // 弹出
+            panelStack.Peek().OnClose();
             panelStack.Pop();
 
             if (panelStack.Count > 0) panelStack.Peek().OnResume();
@@ -133,20 +167,35 @@ namespace UG20260527
         /* -------------------------------------------- 生命周期 -------------------------------------------- */
 
         /// <summary>
-        /// Panel显示时
+        /// Panel初始化时
         /// </summary>
-        public virtual void OnEnter()
+        public virtual UniTask OnInit<T>(Action<T> onInit = null) where T : PanelBase 
         {
-            // Panel控制
+            // 可以 异步加载，获取，添加 资源和组件
+            // CanvasGroup
             canvasGroup = gameObject.GetComponent<CanvasGroup>();
-            if (canvasGroup  == null) canvasGroup = gameObject.AddComponent<CanvasGroup>();
-            canvasGroup.blocksRaycasts = true;
-            canvasGroup.interactable = true;
-            canvasGroup.alpha = 1.0f;
+            if (canvasGroup == null) canvasGroup = gameObject.AddComponent<CanvasGroup>();
+            
+            // 回调
+            onInit?.Invoke(this as T);
+
+            return UniTask.CompletedTask;
         }
 
         /// <summary>
-        /// panel冻结时
+        /// Panel显示时
+        /// </summary>
+        public virtual void OnOpen()
+        {
+            canvasGroup.blocksRaycasts = true;
+            canvasGroup.interactable = true;
+            canvasGroup.alpha = 1.0f;
+
+            // 子类 监听UI事件
+        }
+
+        /// <summary>
+        /// Panel冻结时
         /// </summary>
         public virtual void OnPause()
         {
@@ -168,7 +217,7 @@ namespace UG20260527
         /// <summary>
         /// panel销毁时
         /// </summary>
-        public virtual void OnExit()
+        public virtual void OnClose()
         {
             GameObject.Destroy(gameObject);
         }

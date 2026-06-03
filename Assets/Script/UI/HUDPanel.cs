@@ -14,9 +14,9 @@ namespace UG20260527
 
         private IScoreModel mScoreModel;
 
-        public override void OnEnter()
+        public override void OnOpen()
         {
-            base.OnEnter();
+            base.OnOpen();
 
             // 初始化 子UI组件
             ScoreText = GetComponentInChildren<Text>("ScoreText");

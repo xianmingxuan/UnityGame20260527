@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using QFramework;
-using System.Threading.Tasks;
 
 namespace UG20260527
 {
@@ -11,7 +10,13 @@ namespace UG20260527
         private async void Start()
         {
             // MainPanel
-            var panelSC = await this.GetSystem<IUISystem>().PushPanel<MainPanel>();
+            await this.GetSystem<IUISystem>().OpenSinglePanel<MainPanel>(panelSC =>
+            {
+                //panelSC.InitPageActive("Toggle_Activity", false);
+                panelSC.InitPageActive("Toggle_Bag", false);
+                //panelSC.InitPageActive("Toggle_BeginPlay", false);
+                panelSC.InitToggleGroup(1);
+            });
         }
 
 
