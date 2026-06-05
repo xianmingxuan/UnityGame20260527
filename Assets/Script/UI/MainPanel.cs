@@ -1,7 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using QFramework;
 using System;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -35,8 +34,8 @@ namespace UG20260527
             {
                 if (IsOn)
                 {
+                    //Debug.Log($"切换到页面 {GetComponentInChildren<Text>(toggle_BeginPlay.gameObject, "Label").text}");
                     toggle_BeginPlay.interactable = false;
-                    Debug.Log($"切换到页面 {GetComponentInChildren<Text>(toggle_BeginPlay.gameObject, "Label").text}");
                     if (!panel_BeginPlay)
                     {
                         panel_BeginPlay = await this.GetSystem<IUISystem>().OpenSinglePanel<BeginGamePanel>(panelSC =>
@@ -48,8 +47,8 @@ namespace UG20260527
                 }
                 else
                 {
+                    //Debug.Log($"取消页面 {GetComponentInChildren<Text>(toggle_BeginPlay.gameObject, "Label").text}");
                     toggle_BeginPlay.interactable = true;
-                    Debug.Log($"取消页面 {GetComponentInChildren<Text>(toggle_BeginPlay.gameObject, "Label").text}");
                     if (panel_BeginPlay && panel_BeginPlay.gameObject.activeSelf)
                     {
                         panel_BeginPlay.gameObject.SetActive(false);
@@ -64,8 +63,8 @@ namespace UG20260527
             {
                 if (IsOn)
                 {
+                    //Debug.Log($"切换到页面 {GetComponentInChildren<Text>(toggle_Bag.gameObject, "Label").text}");
                     toggle_Bag.interactable = false;
-                    Debug.Log($"切换到页面 {GetComponentInChildren<Text>(toggle_Bag.gameObject, "Label").text}");
                     if (!panel_Bag)
                     {
                         panel_Bag = await this.GetSystem<IUISystem>().OpenSinglePanel<BagPanel>(panelSC =>
@@ -77,8 +76,8 @@ namespace UG20260527
                 }
                 else
                 {
+                    //Debug.Log($"取消页面 {GetComponentInChildren<Text>(toggle_Bag.gameObject, "Label").text}");
                     toggle_Bag.interactable = true;
-                    Debug.Log($"取消页面 {GetComponentInChildren<Text>(toggle_Bag.gameObject, "Label").text}");
                     if (panel_Bag && panel_Bag.gameObject.activeSelf)
                     {
                         panel_Bag.gameObject.SetActive(false);
@@ -109,18 +108,18 @@ namespace UG20260527
         {
             base.OnPause();
 
-            // 子面板 冻结
-            if (panel_BeginPlay) panel_BeginPlay.OnPause();
-            if (panel_Bag) panel_Bag.OnPause();
+            // 子面板 冻结（可以不写）
+            //if (panel_BeginPlay) panel_BeginPlay.OnPause();
+            //if (panel_Bag) panel_Bag.OnPause();
         }
 
         public override void OnResume()
         {
             base.OnResume();
 
-            // 子面板 恢复
-            if(panel_BeginPlay) panel_BeginPlay.OnResume();
-            if (panel_Bag) panel_Bag.OnResume();
+            // 子面板 恢复（可以不写）
+            //if(panel_BeginPlay) panel_BeginPlay.OnResume();
+            //if (panel_Bag) panel_Bag.OnResume();
         }
 
         public override void OnClose()

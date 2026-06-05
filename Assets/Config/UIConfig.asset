@@ -36,4 +36,10 @@ MonoBehaviour:
       m_AssetGUID: afa5ace141c57ce4db6ea9fb3e0ff165
       m_SubObjectName: 
       m_SubObjectType: 
+      m_EditorAssetChanged: 1
+  - panelScript: {fileID: 11500000, guid: f50500217cfe8474ea133f59f5942bc8, type: 3}
+    panelAssetRef:
+      m_AssetGUID: ca30acf9307f9464ebc36276200a7386
+      m_SubObjectName: 
+      m_SubObjectType: 
       m_EditorAssetChanged: 0

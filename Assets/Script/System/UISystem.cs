@@ -2,7 +2,6 @@
 using QFramework;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
@@ -14,6 +13,7 @@ namespace UG20260527
     public interface IUISystem : ISystem
     {
         public UniTask<T> OpenSinglePanel<T>(Action<T> onInit = null, bool isPushStack = true) where T : PanelBase;
+        public UniTask<PanelBase> OpenSinglePanel(Type type, Action<PanelBase> onInit, bool isPushStack);
         public UniTask CloseSinglePanel(PanelBase panelSC = null);
     }
 
@@ -74,7 +74,23 @@ namespace UG20260527
 
             return uiConfig.panelConfigDic[typeof(T)].panelAssetRef;
         }
-        
+
+        private async UniTask<AssetReference> GetPanelAssetRef(Type type)
+        {
+            if (uiConfig == null)
+            {
+                await LoadUIConfig();
+            }
+
+            if (!uiConfig.panelConfigDic.ContainsKey(type))
+            {
+                Debug.LogWarning($"{uiConfig.name} 配置表中没有 {type.Name} 资源");
+                return null;
+            }
+
+            return uiConfig.panelConfigDic[type].panelAssetRef;
+        }
+
         // 根据Type 实例化Panel和脚本
         private async UniTask<T> CreatePanel<T>(Action<T> onInit) where T : PanelBase
         {
@@ -88,6 +104,23 @@ namespace UG20260527
             // 添加 控制脚本
             T panelScript = panel.GetComponent<T>();
             if (panelScript == null) panelScript = panel.AddComponent<T>();
+            await panelScript.OnInit(onInit);
+
+            return panelScript;
+        }
+
+        private async UniTask<PanelBase> CreatePanel(Type type, Action<PanelBase> onInit)
+        {
+            // 获取Panel资源
+            AssetReference panelAssetRef = await GetPanelAssetRef(type);
+            if (panelAssetRef == null) return null;
+
+            // 实例化Panel
+            var panel = await panelAssetRef.InstantiateAsync(parentCanvas, false).Task;
+
+            // 添加 控制脚本
+            PanelBase panelScript = panel.GetComponent(type) as PanelBase;
+            if (panelScript == null) panelScript = panel.AddComponent(type) as PanelBase;
             await panelScript.OnInit(onInit);
 
             return panelScript;
@@ -111,6 +144,40 @@ namespace UG20260527
 
             // 创建Panel
             T panelScript = await CreatePanel<T>(onInit);
+            if (panelScript == null)
+            {
+                // 加载中Panel--
+                pushingPanelCount.Value--;
+                return null;
+            }
+
+            // 冻结栈顶
+            if (panelStack.Count > 0) panelStack.Peek().OnPause();
+
+            // 入栈 并 启用
+            panelStack.Push(panelScript);
+            panelScript.OnOpen();
+
+            // 加载中Panel--
+            pushingPanelCount.Value--;
+            return panelScript;
+        }
+
+        async UniTask<PanelBase> IUISystem.OpenSinglePanel(Type type, Action<PanelBase> onInit, bool isPushStack)
+        {
+            // 不入栈（由创建者自己管理，例如：子面板）
+            if (!isPushStack)
+            {
+                PanelBase panelSC = await CreatePanel(type, onInit);
+                panelSC.OnOpen();
+                return panelSC;
+            }
+
+            // 加载中Panel++
+            pushingPanelCount.Value++;
+
+            // 创建Panel
+            PanelBase panelScript = await CreatePanel(type, onInit);
             if (panelScript == null)
             {
                 // 加载中Panel--

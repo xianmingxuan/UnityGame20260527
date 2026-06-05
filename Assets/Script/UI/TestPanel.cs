@@ -10,7 +10,7 @@ namespace UG20260527
         {
             base.OnOpen();
 
-            GetComponentInChildren<Button>("BtnTest").onClick.AddListener(() =>
+            GetComponentInChildren<Button>("BtnTest")?.onClick.AddListener(() =>
             {
                 Debug.Log("点击测试面板");
                 this.GetSystem<IUISystem>().CloseSinglePanel();
