@@ -1,13 +1,9 @@
 ﻿using Cysharp.Threading.Tasks;
 using QFramework;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
-using static UnityEditor.Progress;
 
 namespace UG20260527
 {
@@ -161,7 +157,7 @@ namespace UG20260527
             for(int i = 0; i < _ItemCount; i++)
             {
                 // 实例化Item
-                var itemSC = await sys.OpenSinglePanel<T>(null, false);
+                var itemSC = await sys.OpenSinglePanel<T>(null, new OpenPanelSetting { isPushStack = false });
                 itemSC.gameObject.name = $"item_{i}";
                 itemSC.transform.SetParent(content);
                 // 更新数据

@@ -18,10 +18,13 @@ namespace UG20260527
 
         public override async UniTask OnInit<T>(Action<T> onInit = null)
         {
+            // 回调 初始化
+            await base.OnInit<T>(null);
+
             // 可以 异步加载，获取，添加 资源
 
-            // 回调 初始化
-            await base.OnInit(onInit);
+            // 执行回调
+            onInit?.Invoke(this as T);
         }
 
         public override void OnOpen()
@@ -41,7 +44,7 @@ namespace UG20260527
                         panel_BeginPlay = await this.GetSystem<IUISystem>().OpenSinglePanel<BeginGamePanel>(panelSC =>
                         {
                             panelSC.transform.SetParent(GetComponentInChildren<Transform>("PageContext"));
-                        }, false);
+                        }, new OpenPanelSetting { isPushStack = false});
                     }
                     panel_BeginPlay.gameObject.SetActive(true);
                 }
@@ -70,7 +73,7 @@ namespace UG20260527
                         panel_Bag = await this.GetSystem<IUISystem>().OpenSinglePanel<BagPanel>(panelSC =>
                         {
                             panelSC.transform.SetParent(GetComponentInChildren<Transform>("PageContext"));
-                        }, false);
+                        }, new OpenPanelSetting { isPushStack = false });
                     }
                     panel_Bag.gameObject.SetActive(true);
                 }
@@ -128,8 +131,8 @@ namespace UG20260527
 
             // 子面板 销毁（回收）
             var sys = this.GetSystem<IUISystem>();
-            if (panel_BeginPlay) sys.CloseSinglePanel(panel_BeginPlay);
-            if (panel_Bag) sys.CloseSinglePanel(panel_Bag);
+            if (panel_BeginPlay) sys.CloseSinglePanel(PanelLayer.NormalLayer, new ClosePanelSetting { panelShouldClose = panel_BeginPlay });
+            if (panel_Bag) sys.CloseSinglePanel(PanelLayer.NormalLayer, new ClosePanelSetting { panelShouldClose = panel_Bag });
         }
 
 

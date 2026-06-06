@@ -14,30 +14,35 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   panelConfigList:
   - panelScript: {fileID: 11500000, guid: 5bccb20a560983f499a17628f4444ed4, type: 3}
+    panelLayer: 1
     panelAssetRef:
       m_AssetGUID: 9b2dd39e54242f944bedbe72b3022129
       m_SubObjectName: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
   - panelScript: {fileID: 11500000, guid: 410a654b6a0689740a10cee67b249e49, type: 3}
+    panelLayer: 1
     panelAssetRef:
       m_AssetGUID: 66c063bbb77cfbf4bb1d18db01147e48
       m_SubObjectName: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
   - panelScript: {fileID: 11500000, guid: 97e95b463e1e9694e8afce45bc8c7e52, type: 3}
+    panelLayer: 1
     panelAssetRef:
       m_AssetGUID: af55ed16c69796b4a800a3ed2176dd4e
       m_SubObjectName: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
   - panelScript: {fileID: 11500000, guid: b51b9693df5f4054ba4e30248237e5e1, type: 3}
+    panelLayer: 2
     panelAssetRef:
       m_AssetGUID: afa5ace141c57ce4db6ea9fb3e0ff165
       m_SubObjectName: 
       m_SubObjectType: 
       m_EditorAssetChanged: 1
   - panelScript: {fileID: 11500000, guid: f50500217cfe8474ea133f59f5942bc8, type: 3}
+    panelLayer: 1
     panelAssetRef:
       m_AssetGUID: ca30acf9307f9464ebc36276200a7386
       m_SubObjectName: 

@@ -7,14 +7,89 @@ using UnityEngine.AddressableAssets;
 
 namespace UG20260527
 {
+    /// <summary>
+    /// UI面板的层级
+    /// </summary>
+    public enum PanelLayer
+    {
+        /// <summary>
+        /// 背景层：位于画面最底部，作为背景
+        /// </summary>
+        BackgroundLayer,
+        /// <summary>
+        /// 正常层（弹窗层）：
+        /// 1.常驻界面，如技能栏、背包、任务栏等；
+        /// 2.临时可交互界面，如设置面板、背包详情、“确定，取消”等
+        /// 3.作为某个Normal面板 的 子面板界面，如 背包子面板，开始游戏子面板等
+        /// </summary>
+        NormalLayer,
+        /// <summary>
+        /// 提示层：短暂出现的非交互式信息，例如“道具已获得”、“网络连接失败”等
+        /// </summary>
+        TipLayer,
+        /// <summary>
+        /// 新手引导层：新手引导或强制操作指引
+        /// </summary>
+        GuideLayer,
+        /// <summary>
+        /// 加载层：场景切换或异步加载资源时显示加载界面和进度条
+        /// </summary>
+        LoadingLayer,
+        /// <summary>
+        /// 最上层（杂项层）：显示最高优先级的非阻断信息，如电池电量、网络信号、当前时间等状态栏信息
+        /// </summary>
+        TopLayer,
+    }
 
-    /* ---------------------------------------------------------------- UI系统 -------------------------------------------------------- */
+    /// <summary>
+    /// 打开面板时的特殊设置
+    /// </summary>
+    public struct OpenPanelSetting
+    {
+        /// <summary>
+        /// 是否入栈（让UI栈控制面板冻结，子面板一般不入栈）
+        /// </summary>
+        public bool isPushStack;
+
+        public OpenPanelSetting(bool isPushStack)
+        {
+            this.isPushStack = isPushStack;
+        }
+
+        /// <summary>
+        /// 构建 默认值（正常情况下都使用这个默认值来OpenPanel）
+        /// </summary>
+        /// <returns></returns>
+        public static OpenPanelSetting DefaultValue() => new OpenPanelSetting(true);
+    }
+
+    public struct ClosePanelSetting
+    {
+        /// <summary>
+        /// 需要关闭的Panel，一般是不受UI栈控制的Panel，如子面板
+        /// </summary>
+        public PanelBase panelShouldClose;
+
+        public ClosePanelSetting(PanelBase panel)
+        {
+            this.panelShouldClose = panel;
+        }
+
+        /// <summary>
+        /// 构建 默认值（正常情况下都使用这个默认值来关闭Panel）
+        /// </summary>
+        /// <returns></returns>
+        public static ClosePanelSetting DefaultValue() => new ClosePanelSetting(null);
+    }
+
+
+    /* -------------------------------------------------------------------------------- UI系统 ---------------------------------------------------------------------------- */
 
     public interface IUISystem : ISystem
     {
-        public UniTask<T> OpenSinglePanel<T>(Action<T> onInit = null, bool isPushStack = true) where T : PanelBase;
-        public UniTask<PanelBase> OpenSinglePanel(Type type, Action<PanelBase> onInit, bool isPushStack);
-        public UniTask CloseSinglePanel(PanelBase panelSC = null);
+        public UniTask<T> OpenSinglePanel<T>(Action<T> onInit = null, OpenPanelSetting? openPanelSetting = null) where T : PanelBase;
+        public UniTask<PanelBase> OpenSinglePanel(Type type, Action<PanelBase> onInit, OpenPanelSetting? openPanelSetting = null);
+        public UniTask CloseSinglePanel(PanelLayer layer = PanelLayer.NormalLayer, ClosePanelSetting? closePanelSetting = null);
     }
 
     public class UISystem : AbstractSystem, IUISystem
@@ -23,24 +98,36 @@ namespace UG20260527
 
         // Panel 配置表
         private string uiConfigPath = "Assets/Config/UIConfig.asset";
-        public UIConfig uiConfig;
+        private UIConfig uiConfig;
 
         // UI栈
-        public Stack<PanelBase> panelStack;
+        private Dictionary<PanelLayer, List<PanelBase>> _panelStacks;
+        // 层级对象，Panel创建后需要挂载到目标层级gameObject下
+        private Dictionary<PanelLayer, Transform> _layerGameObjects;
         // 正在加载 准备入栈的Panel数量
-        public BindableProperty<int> pushingPanelCount { get; } = new BindableProperty<int>(0);
+        private BindableProperty<int> pushingPanelCount { get; } = new BindableProperty<int>(0);
 
         // 画布面板
-        public Transform parentCanvas;
+        private Transform parentCanvas;
 
 
         protected override void OnInit()
         {
-            panelStack = new Stack<PanelBase>();
             // 获取 画布面板
             var obj = GameObject.Find("Canvas");
             if (obj == null) Debug.LogWarning("场景中没有 Canvas画布");
             else parentCanvas = obj.transform;
+
+            // 初始化Panel栈 和 层级对象
+            _panelStacks = new Dictionary<PanelLayer, List<PanelBase>>();
+            _layerGameObjects = new Dictionary<PanelLayer, Transform>();
+            foreach (PanelLayer layer in Enum.GetValues(typeof(PanelLayer)))
+            {
+                Transform layarTrans = new GameObject(layer.ToString()).transform;
+                layarTrans.parent = parentCanvas;
+                layarTrans.localPosition = Vector3.zero;
+                _layerGameObjects.Add(layer, layarTrans);
+            }
 
             // 加载中Panel数量
             pushingPanelCount.Register(value =>
@@ -48,6 +135,59 @@ namespace UG20260527
                 if (value < 0) pushingPanelCount.Value = 0;
             });
         }
+
+        /* -------------------------------------------------- Panel栈函数 -------------------------------------------------- */
+
+        // 获取、添加UI栈
+        private List<PanelBase> GetOrAddPanelStack(PanelLayer layer)
+        {
+            if (!_panelStacks.ContainsKey(layer))
+            {
+                // 添加 目标层级的UI栈
+                _panelStacks.Add(layer, new List<PanelBase>());
+            }
+            if (!_layerGameObjects.ContainsKey(layer))
+            {
+                Transform layarTrans = new GameObject(layer.ToString()).transform;
+                layarTrans.parent = parentCanvas;
+                layarTrans.localPosition = Vector3.zero;
+                _layerGameObjects.Add(layer, layarTrans);
+            }
+            return _panelStacks[layer];
+        }
+
+        // 入栈 目标脚本
+        void PushPanelStack(PanelBase panelScript)
+        {
+            // 获取目标层级UI栈
+            List<PanelBase> panelStack = GetOrAddPanelStack(panelScript.panelConfig.panelLayer);
+            panelScript.transform.SetParent(_layerGameObjects[panelScript.panelConfig.panelLayer]);
+            panelScript.transform.localPosition = Vector3.zero;
+
+            // 冻结栈顶
+            if (panelStack.Count > 0) panelStack[panelStack.Count - 1].OnPause();
+
+            // 入栈 并 启用
+            panelStack.Add(panelScript);
+            panelScript.OnOpen();
+        }
+
+        // 弹栈 目标层级
+        void PopPanelStack(PanelLayer layer)
+        {
+            // 检查是否存在UI栈
+            if (_panelStacks.Count <= 0) return;
+            if (!_panelStacks.ContainsKey(layer)) return;
+            if (_panelStacks[layer].Count <= 0) return;
+
+            // 弹出
+            _panelStacks[layer][_panelStacks[layer].Count - 1].OnClose();
+            _panelStacks[layer].RemoveAt(_panelStacks[layer].Count - 1);
+
+            // 恢复
+            if (_panelStacks[layer].Count > 0) _panelStacks[layer][_panelStacks[layer].Count - 1].OnResume();
+        }
+
 
         /* -------------------------------------------------- API函数 -------------------------------------------------- */
 
@@ -104,6 +244,9 @@ namespace UG20260527
             // 添加 控制脚本
             T panelScript = panel.GetComponent<T>();
             if (panelScript == null) panelScript = panel.AddComponent<T>();
+
+            // 初始化配置脚本
+            panelScript.panelConfig = uiConfig.panelConfigDic[typeof(T)];  // 面板配置：面板层级等
             await panelScript.OnInit(onInit);
 
             return panelScript;
@@ -121,6 +264,9 @@ namespace UG20260527
             // 添加 控制脚本
             PanelBase panelScript = panel.GetComponent(type) as PanelBase;
             if (panelScript == null) panelScript = panel.AddComponent(type) as PanelBase;
+
+            // 初始化配置脚本
+            panelScript.panelConfig = uiConfig.panelConfigDic[type];  // 面板配置：面板层级等
             await panelScript.OnInit(onInit);
 
             return panelScript;
@@ -129,10 +275,14 @@ namespace UG20260527
 
         /* -------------------------------------------------- 接口函数 -------------------------------------------------- */
 
-        async UniTask<T> IUISystem.OpenSinglePanel<T>(Action<T> onInit, bool isPushStack)
+        async UniTask<T> IUISystem.OpenSinglePanel<T>(Action<T> onInit, OpenPanelSetting? openPanelSetting)
         {
+            // OpenPanel时的特殊配置
+            OpenPanelSetting setting = openPanelSetting ?? OpenPanelSetting.DefaultValue();
+
+
             // 不入栈（由创建者自己管理，例如：子面板）
-            if(!isPushStack)
+            if (!setting.isPushStack)
             {
                 T panelSC = await CreatePanel<T>(onInit);
                 panelSC.OnOpen();
@@ -151,22 +301,21 @@ namespace UG20260527
                 return null;
             }
 
-            // 冻结栈顶
-            if (panelStack.Count > 0) panelStack.Peek().OnPause();
-
-            // 入栈 并 启用
-            panelStack.Push(panelScript);
-            panelScript.OnOpen();
+            // 入栈
+            PushPanelStack(panelScript);
 
             // 加载中Panel--
             pushingPanelCount.Value--;
             return panelScript;
         }
 
-        async UniTask<PanelBase> IUISystem.OpenSinglePanel(Type type, Action<PanelBase> onInit, bool isPushStack)
+        async UniTask<PanelBase> IUISystem.OpenSinglePanel(Type type, Action<PanelBase> onInit, OpenPanelSetting? openPanelSetting)
         {
+            // OpenPanel时的特殊配置
+            OpenPanelSetting setting = openPanelSetting ?? OpenPanelSetting.DefaultValue();
+
             // 不入栈（由创建者自己管理，例如：子面板）
-            if (!isPushStack)
+            if (!setting.isPushStack)
             {
                 PanelBase panelSC = await CreatePanel(type, onInit);
                 panelSC.OnOpen();
@@ -185,40 +334,52 @@ namespace UG20260527
                 return null;
             }
 
-            // 冻结栈顶
-            if (panelStack.Count > 0) panelStack.Peek().OnPause();
-
-            // 入栈 并 启用
-            panelStack.Push(panelScript);
-            panelScript.OnOpen();
+            // 入栈
+            PushPanelStack(panelScript);
 
             // 加载中Panel--
             pushingPanelCount.Value--;
             return panelScript;
         }
 
-        async UniTask IUISystem.CloseSinglePanel(PanelBase panelSC)
+
+
+        async UniTask IUISystem.CloseSinglePanel(PanelLayer layer, ClosePanelSetting? closePanelSetting)
         {
-            if(panelSC != null)
+            ClosePanelSetting setting = closePanelSetting ?? ClosePanelSetting.DefaultValue();
+            if(setting.panelShouldClose != null)
             {
-                panelSC.OnClose();
+                // 遍历所有UI栈，将目标Panel踢出
+                foreach(var stack in _panelStacks.Values)
+                {
+                    foreach(var panel in stack)
+                    {
+                        if(panel == setting.panelShouldClose)
+                        {
+                            stack.Remove(panel);
+                            // 恢复
+                            if (stack.Count > 0 && stack[stack.Count - 1].isPause) stack[stack.Count - 1].OnResume();
+                        }
+                    }
+                }
+                // 关闭 目标Panel
+                setting.panelShouldClose.OnClose();
                 return;
             }
 
             // 先等其它 push任务 完成
             if(pushingPanelCount.Value > 0) await UniTask.WaitUntil(() => pushingPanelCount.Value <= 0);
-            if (panelStack.Count <= 0) return;
-            // 弹出
-            panelStack.Peek().OnClose();
-            panelStack.Pop();
 
-            if (panelStack.Count > 0) panelStack.Peek().OnResume();
+            // 弹栈
+            PopPanelStack(layer);
         }
+
+        
     }
 
 
 
-    /* -------------------------------------------------------------- UIPanel基类 -------------------------------------------------------- */
+    /* ----------------------------------------------------------------------------- UIPanel基类 ---------------------------------------------------------------------------- */
 
     /// <summary>
     /// Panel基类
@@ -226,9 +387,19 @@ namespace UG20260527
     public abstract class PanelBase : MonoBehaviour, IController
     {
         /// <summary>
+        /// 面板配置：包含 面板层级
+        /// </summary>
+        public PanelConfig panelConfig;
+
+        /// <summary>
         /// Panel控制组件
         /// </summary>
         public CanvasGroup canvasGroup;
+
+        /// <summary>
+        /// 是否处于 冻结状态
+        /// </summary>
+        public bool isPause = false;
 
 
         /* -------------------------------------------- 生命周期 -------------------------------------------- */
@@ -243,6 +414,8 @@ namespace UG20260527
             canvasGroup = gameObject.GetComponent<CanvasGroup>();
             if (canvasGroup == null) canvasGroup = gameObject.AddComponent<CanvasGroup>();
             
+            // 执行子类
+
             // 回调
             onInit?.Invoke(this as T);
 
@@ -269,6 +442,7 @@ namespace UG20260527
             canvasGroup.blocksRaycasts = false;
             canvasGroup.interactable = false;
             canvasGroup.alpha = 0.7f;
+            isPause = true;
         }
 
         /// <summary>
@@ -279,6 +453,7 @@ namespace UG20260527
             canvasGroup.blocksRaycasts = true;
             canvasGroup.interactable = true;
             canvasGroup.alpha = 1.0f;
+            isPause = false;
         }
 
         /// <summary>

@@ -16,7 +16,7 @@ namespace UG20260527
             var item = GetComponentInChildren<TestItem>("TestItem");
             if (item == null)
             {
-                item = await this.GetSystem<IUISystem>().OpenSinglePanel<TestItem>(null, false);
+                item = await this.GetSystem<IUISystem>().OpenSinglePanel<TestItem>(null, new OpenPanelSetting { isPushStack = false });
                 item.transform.SetParent(scroll.content);
                 item.transform.localPosition = Vector3.zero;
             }

@@ -14,10 +14,13 @@ namespace UG20260527
         [Tooltip("面板控制脚本")]
         public MonoScript panelScript;
 
+        [Tooltip("面板层级类型")]
+        public PanelLayer panelLayer = PanelLayer.NormalLayer;
+
         [Tooltip("面板资源")]
         public AssetReference panelAssetRef;
 
-        // 面板层级
+        
     }
 
     [CreateAssetMenu(fileName = "NewUIConfig", menuName = "Config/UIConfig")]

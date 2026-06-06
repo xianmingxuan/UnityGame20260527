@@ -19,16 +19,6 @@ namespace UG20260527
         private Image img;
         private Color color;
 
-        //private void OnValidate()
-        //{
-        //    if(rectTransform == null) rectTransform = GetComponent<RectTransform>();
-
-        //    if (rectTransform.pivot != Vector2.up)
-        //    {
-        //        rectTransform.pivot = Vector2.up;
-        //        Debug.LogWarning($"LoopScrollItem 的 rectTransform.pivot 必须为{Vector2.up}");
-        //    }
-        //}
 
         private void Reset()
         {
