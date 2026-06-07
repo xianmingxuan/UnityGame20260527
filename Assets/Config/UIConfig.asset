@@ -48,3 +48,17 @@ MonoBehaviour:
       m_SubObjectName: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
+  - panelScript: {fileID: 11500000, guid: 4990cb7fdf36a434289ebd5cbb36a6ed, type: 3}
+    panelLayer: 1
+    panelAssetRef:
+      m_AssetGUID: c333115133c64074bbc3c338cea81aed
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
+  - panelScript: {fileID: 11500000, guid: 0c5f88901c8110e48b8b993f9b365af2, type: 3}
+    panelLayer: 1
+    panelAssetRef:
+      m_AssetGUID: ab140478dd3dd1249a86cbc17bcb1d5d
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 1

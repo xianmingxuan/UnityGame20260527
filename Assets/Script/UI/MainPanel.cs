@@ -16,10 +16,10 @@ namespace UG20260527
 
         /* -------------------------------------------------- 生命周期 -------------------------------------------------- */
 
-        public override async UniTask OnInit<T>(Action<T> onInit = null)
+        public override async UniTask OnInit<T>(Action<T> onInit = null, object userData = null)
         {
             // 回调 初始化
-            await base.OnInit<T>(null);
+            await base.OnInit<T>(null, userData);
 
             // 可以 异步加载，获取，添加 资源
 
@@ -44,7 +44,7 @@ namespace UG20260527
                         panel_BeginPlay = await this.GetSystem<IUISystem>().OpenSinglePanel<BeginGamePanel>(panelSC =>
                         {
                             panelSC.transform.SetParent(GetComponentInChildren<Transform>("PageContext"));
-                        }, new OpenPanelSetting { isPushStack = false});
+                        }, null, new OpenPanelSetting { isPushStack = false});
                     }
                     panel_BeginPlay.gameObject.SetActive(true);
                 }
@@ -73,7 +73,7 @@ namespace UG20260527
                         panel_Bag = await this.GetSystem<IUISystem>().OpenSinglePanel<BagPanel>(panelSC =>
                         {
                             panelSC.transform.SetParent(GetComponentInChildren<Transform>("PageContext"));
-                        }, new OpenPanelSetting { isPushStack = false });
+                        }, null, new OpenPanelSetting { isPushStack = false });
                     }
                     panel_Bag.gameObject.SetActive(true);
                 }

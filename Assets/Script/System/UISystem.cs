@@ -50,6 +50,8 @@ namespace UG20260527
         /// 是否入栈（让UI栈控制面板冻结，子面板一般不入栈）
         /// </summary>
         public bool isPushStack;
+        // 旧面板是否冻结
+        // 旧面板冻结时，透明度设置成多少
 
         public OpenPanelSetting(bool isPushStack)
         {
@@ -87,8 +89,8 @@ namespace UG20260527
 
     public interface IUISystem : ISystem
     {
-        public UniTask<T> OpenSinglePanel<T>(Action<T> onInit = null, OpenPanelSetting? openPanelSetting = null) where T : PanelBase;
-        public UniTask<PanelBase> OpenSinglePanel(Type type, Action<PanelBase> onInit, OpenPanelSetting? openPanelSetting = null);
+        public UniTask<T> OpenSinglePanel<T>(Action<T> onInit = null, object userData = null, OpenPanelSetting? openPanelSetting = null) where T : PanelBase;
+        public UniTask<PanelBase> OpenSinglePanel(Type type, Action<PanelBase> onInit = null, object userData = null, OpenPanelSetting? openPanelSetting = null);
         public UniTask CloseSinglePanel(PanelLayer layer = PanelLayer.NormalLayer, ClosePanelSetting? closePanelSetting = null);
     }
 
@@ -188,6 +190,33 @@ namespace UG20260527
             if (_panelStacks[layer].Count > 0) _panelStacks[layer][_panelStacks[layer].Count - 1].OnResume();
         }
 
+        // 弹栈 目标Panel（仅弹栈，不执行Panel的OnClose，脱离UI栈的管理）
+        void PopPanelStackOnly(PanelBase targetPanel)
+        {
+            // 遍历所有UI栈，将目标Panel踢出
+            if (_panelStacks.Values.Count > 0)
+            {
+                bool isComplete = false;
+                foreach (var stack in _panelStacks.Values)
+                {
+                    if (isComplete) break;
+                    if (stack == null || stack.Count <= 0) continue;
+                    foreach (var panel in stack)
+                    {
+                        if (panel == null) continue;
+                        if (panel == targetPanel)
+                        {
+                            stack.Remove(panel);
+                            // 恢复
+                            if (stack.Count > 0 && stack[stack.Count - 1].isPause) stack[stack.Count - 1].OnResume();
+                            isComplete = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
 
         /* -------------------------------------------------- API函数 -------------------------------------------------- */
 
@@ -232,7 +261,7 @@ namespace UG20260527
         }
 
         // 根据Type 实例化Panel和脚本
-        private async UniTask<T> CreatePanel<T>(Action<T> onInit) where T : PanelBase
+        private async UniTask<T> CreatePanel<T>(Action<T> onInit, object userData) where T : PanelBase
         {
             // 获取Panel资源
             AssetReference panelAssetRef = await GetPanelAssetRef<T>();
@@ -247,12 +276,12 @@ namespace UG20260527
 
             // 初始化配置脚本
             panelScript.panelConfig = uiConfig.panelConfigDic[typeof(T)];  // 面板配置：面板层级等
-            await panelScript.OnInit(onInit);
+            await panelScript.OnInit(onInit, userData);
 
             return panelScript;
         }
 
-        private async UniTask<PanelBase> CreatePanel(Type type, Action<PanelBase> onInit)
+        private async UniTask<PanelBase> CreatePanel(Type type, Action<PanelBase> onInit, object userData)
         {
             // 获取Panel资源
             AssetReference panelAssetRef = await GetPanelAssetRef(type);
@@ -267,7 +296,7 @@ namespace UG20260527
 
             // 初始化配置脚本
             panelScript.panelConfig = uiConfig.panelConfigDic[type];  // 面板配置：面板层级等
-            await panelScript.OnInit(onInit);
+            await panelScript.OnInit(onInit, userData);
 
             return panelScript;
         }
@@ -275,7 +304,7 @@ namespace UG20260527
 
         /* -------------------------------------------------- 接口函数 -------------------------------------------------- */
 
-        async UniTask<T> IUISystem.OpenSinglePanel<T>(Action<T> onInit, OpenPanelSetting? openPanelSetting)
+        async UniTask<T> IUISystem.OpenSinglePanel<T>(Action<T> onInit, object userData, OpenPanelSetting? openPanelSetting)
         {
             // OpenPanel时的特殊配置
             OpenPanelSetting setting = openPanelSetting ?? OpenPanelSetting.DefaultValue();
@@ -284,7 +313,7 @@ namespace UG20260527
             // 不入栈（由创建者自己管理，例如：子面板）
             if (!setting.isPushStack)
             {
-                T panelSC = await CreatePanel<T>(onInit);
+                T panelSC = await CreatePanel<T>(onInit, userData);
                 panelSC.OnOpen();
                 return panelSC;
             }
@@ -293,7 +322,7 @@ namespace UG20260527
             pushingPanelCount.Value++;
 
             // 创建Panel
-            T panelScript = await CreatePanel<T>(onInit);
+            T panelScript = await CreatePanel<T>(onInit, userData);
             if (panelScript == null)
             {
                 // 加载中Panel--
@@ -309,7 +338,7 @@ namespace UG20260527
             return panelScript;
         }
 
-        async UniTask<PanelBase> IUISystem.OpenSinglePanel(Type type, Action<PanelBase> onInit, OpenPanelSetting? openPanelSetting)
+        async UniTask<PanelBase> IUISystem.OpenSinglePanel(Type type, Action<PanelBase> onInit, object userData, OpenPanelSetting? openPanelSetting)
         {
             // OpenPanel时的特殊配置
             OpenPanelSetting setting = openPanelSetting ?? OpenPanelSetting.DefaultValue();
@@ -317,7 +346,7 @@ namespace UG20260527
             // 不入栈（由创建者自己管理，例如：子面板）
             if (!setting.isPushStack)
             {
-                PanelBase panelSC = await CreatePanel(type, onInit);
+                PanelBase panelSC = await CreatePanel(type, onInit, userData);
                 panelSC.OnOpen();
                 return panelSC;
             }
@@ -326,7 +355,7 @@ namespace UG20260527
             pushingPanelCount.Value++;
 
             // 创建Panel
-            PanelBase panelScript = await CreatePanel(type, onInit);
+            PanelBase panelScript = await CreatePanel(type, onInit, userData);
             if (panelScript == null)
             {
                 // 加载中Panel--
@@ -346,29 +375,20 @@ namespace UG20260527
 
         async UniTask IUISystem.CloseSinglePanel(PanelLayer layer, ClosePanelSetting? closePanelSetting)
         {
+            // 先等其它 push任务 完成
+            if (pushingPanelCount.Value > 0) await UniTask.WaitUntil(() => pushingPanelCount.Value <= 0);
+
+            // 弹出指定Panel
             ClosePanelSetting setting = closePanelSetting ?? ClosePanelSetting.DefaultValue();
             if(setting.panelShouldClose != null)
             {
-                // 遍历所有UI栈，将目标Panel踢出
-                foreach(var stack in _panelStacks.Values)
-                {
-                    foreach(var panel in stack)
-                    {
-                        if(panel == setting.panelShouldClose)
-                        {
-                            stack.Remove(panel);
-                            // 恢复
-                            if (stack.Count > 0 && stack[stack.Count - 1].isPause) stack[stack.Count - 1].OnResume();
-                        }
-                    }
-                }
+                // 弹栈 目标Panel
+                PopPanelStackOnly(setting.panelShouldClose);
+
                 // 关闭 目标Panel
                 setting.panelShouldClose.OnClose();
                 return;
             }
-
-            // 先等其它 push任务 完成
-            if(pushingPanelCount.Value > 0) await UniTask.WaitUntil(() => pushingPanelCount.Value <= 0);
 
             // 弹栈
             PopPanelStack(layer);
@@ -397,6 +417,11 @@ namespace UG20260527
         public CanvasGroup canvasGroup;
 
         /// <summary>
+        /// 初始化数据（数据注入）
+        /// </summary>
+        public object userData;
+
+        /// <summary>
         /// 是否处于 冻结状态
         /// </summary>
         public bool isPause = false;
@@ -407,16 +432,17 @@ namespace UG20260527
         /// <summary>
         /// Panel初始化时
         /// </summary>
-        public virtual UniTask OnInit<T>(Action<T> onInit = null) where T : PanelBase 
+        public virtual UniTask OnInit<T>(Action<T> onInit = null, object userData = null) where T : PanelBase 
         {
             // 可以 异步加载，获取，添加 资源和组件
             // CanvasGroup
             canvasGroup = gameObject.GetComponent<CanvasGroup>();
             if (canvasGroup == null) canvasGroup = gameObject.AddComponent<CanvasGroup>();
             
-            // 执行子类
+            // 数据注入
+            this.userData = userData;
 
-            // 回调
+            // 逻辑注入：回调
             onInit?.Invoke(this as T);
 
             return UniTask.CompletedTask;

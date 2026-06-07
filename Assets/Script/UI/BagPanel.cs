@@ -10,13 +10,13 @@ namespace UG20260527
 {
     public class BagPanel : PanelBase
     {
-        public override async UniTask OnInit<T>(Action<T> onInit = null)
+        public override async UniTask OnInit<T>(Action<T> onInit = null, object userData = null)
         {
             var scroll = GetComponentInChildren<LoopScrollView>("Scroll View");
             var item = GetComponentInChildren<TestItem>("TestItem");
             if (item == null)
             {
-                item = await this.GetSystem<IUISystem>().OpenSinglePanel<TestItem>(null, new OpenPanelSetting { isPushStack = false });
+                item = await this.GetSystem<IUISystem>().OpenSinglePanel<TestItem>(null, null, new OpenPanelSetting { isPushStack = false });
                 item.transform.SetParent(scroll.content);
                 item.transform.localPosition = Vector3.zero;
             }
@@ -31,7 +31,7 @@ namespace UG20260527
 
             await scroll.InitLoopScrollView<TestItem, TestItemData>(item, list);
 
-            await base.OnInit(onInit);
+            await base.OnInit(onInit, userData);
         }
     }
 }

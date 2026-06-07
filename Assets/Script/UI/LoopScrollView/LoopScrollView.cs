@@ -11,10 +11,47 @@ namespace UG20260527
 
     public abstract class LoopScrollItemBase : PanelBase
     {
-        /// <summary>
-        /// 当前Item 在数据列表中的 索引
-        /// </summary>
-        public int DataIndex { get; private set; }
+
+#if UNITY_EDITOR
+
+        private RectTransform rectTransform;
+
+        private void Reset()
+        {
+            if (rectTransform == null) rectTransform = GetComponent<RectTransform>();
+            if (rectTransform.pivot != Vector2.up)
+            {
+                rectTransform.pivot = Vector2.up;
+                Debug.LogWarning($"LoopScrollItem 的 rectTransform.pivot 必须为{Vector2.up}");
+            }
+            if (rectTransform.anchorMin != Vector2.up)
+            {
+                rectTransform.anchorMin = Vector2.up;
+                Debug.LogWarning($"LoopScrollItem 的 rectTransform.anchorMin 必须为{Vector2.up}");
+            }
+            if (rectTransform.anchorMax != Vector2.up)
+            {
+                rectTransform.anchorMax = Vector2.up;
+                Debug.LogWarning($"LoopScrollItem 的 rectTransform.anchorMax 必须为{Vector2.up}");
+            }
+        }
+        private void OnValidate()
+        {
+            if (rectTransform == null) rectTransform = GetComponent<RectTransform>();
+            if (rectTransform.pivot != Vector2.up)
+            {
+                Debug.LogWarning($"LoopScrollItem 的 rectTransform.pivot 必须为{Vector2.up}");
+            }
+            if (rectTransform.anchorMin != Vector2.up)
+            {
+                Debug.LogWarning($"LoopScrollItem 的 rectTransform.anchorMin 必须为{Vector2.up}");
+            }
+            if (rectTransform.anchorMax != Vector2.up)
+            {
+                Debug.LogWarning($"LoopScrollItem 的 rectTransform.anchorMax 必须为{Vector2.up}");
+            }
+        }
+#endif
 
         /// <summary>
         /// 滚动更新Item
@@ -23,17 +60,7 @@ namespace UG20260527
         /// <param name="index"></param>
         public virtual void UpdataItem(object data, int dataIndex)
         {
-            DataIndex = dataIndex;
-        }
-
-        /// <summary>
-        /// 获取ItemSize
-        /// </summary>
-        /// <returns></returns>
-        public virtual Vector2 GetSize()
-        {
-            var trans = transform as RectTransform;
-            return new Vector2(trans.rect.width * trans.localScale.x, trans.rect.height * trans.localScale.y);
+            userData = data;
         }
     }
 
@@ -157,7 +184,7 @@ namespace UG20260527
             for(int i = 0; i < _ItemCount; i++)
             {
                 // 实例化Item
-                var itemSC = await sys.OpenSinglePanel<T>(null, new OpenPanelSetting { isPushStack = false });
+                var itemSC = await sys.OpenSinglePanel<T>(null, null, new OpenPanelSetting { isPushStack = false });
                 itemSC.gameObject.name = $"item_{i}";
                 itemSC.transform.SetParent(content);
                 // 更新数据
