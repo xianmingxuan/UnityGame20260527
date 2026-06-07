@@ -152,7 +152,7 @@
                     "path": "<Keyboard>/escape",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": ";Keyboard",
                     "action": "ESC",
                     "isComposite": false,
                     "isPartOfComposite": false

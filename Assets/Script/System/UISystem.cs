@@ -65,6 +65,9 @@ namespace UG20260527
         public static OpenPanelSetting DefaultValue() => new OpenPanelSetting(true);
     }
 
+    /// <summary>
+    /// 关闭面板时的特殊设置
+    /// </summary>
     public struct ClosePanelSetting
     {
         /// <summary>

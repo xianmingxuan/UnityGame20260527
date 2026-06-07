@@ -13,8 +13,17 @@ namespace UG20260527
 
     public struct InputActionEvent
     {
+        /// <summary>
+        /// 输入Map名
+        /// </summary>
         public string mapName;
+        /// <summary>
+        /// Map中Action名
+        /// </summary>
         public string actionName;
+        /// <summary>
+        /// Action触发时，传入的输入上下文
+        /// </summary>
         public InputAction.CallbackContext context;
 
         public InputActionEvent(string map, string action, InputAction.CallbackContext con)
