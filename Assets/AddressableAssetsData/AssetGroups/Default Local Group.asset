@@ -29,6 +29,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - default
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3eb04a8b5a19daf45a32463fe576bf2c
+    m_Address: Assets/Art
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - texture
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 1eeaa34c2f122524f9062fec01269caf, type: 2}
   m_SchemaSet:

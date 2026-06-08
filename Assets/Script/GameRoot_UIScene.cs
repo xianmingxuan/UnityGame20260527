@@ -1,6 +1,10 @@
-﻿using UnityEngine;
-using QFramework;
+﻿using QFramework;
 using System.Threading.Tasks;
+using Unity.VisualScripting;
+using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.Rendering.VirtualTexturing;
+using UnityEngine.UI;
 
 namespace UG20260527
 {
@@ -41,7 +45,13 @@ namespace UG20260527
             mainPanel.transform.SetParent(GameObject.Find("NormalLayer").transform);
         }
 
+        void Update()
+        {
+            //Debug.Log(Mouse.current.position.ReadValue());
 
+            //var system = this.GetSystem<IUISystem>();
+            //if (system != null) Debug.Log(system.parentCanvas.Value.GetComponent<Canvas>().scaleFactor);
+        }
 
         IArchitecture IBelongToArchitecture.GetArchitecture()
         {

@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Rendering.VirtualTexturing;
 using UnityEngine.UI;
 
 namespace UG20260527
@@ -43,7 +44,7 @@ namespace UG20260527
                 this.GetSystem<IUISystem>().OpenSinglePanel<DynamicInfoPanel>(panel => 
                 {
                     // 面板位置
-                    panel.viewport.localPosition = Mouse.current.position.ReadValue();
+                    panel.viewport.localPosition = Mouse.current.position.ReadValue() / this.GetSystem<IUISystem>().parentCanvas.Value.GetComponent<Canvas>().scaleFactor;
                     panel.itemType = typeof(DynamicInfoItem);
                     panel.dataList = new List<object>
                     {

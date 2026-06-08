@@ -39,7 +39,7 @@ namespace UG20260527
                 _system.OpenSinglePanel<DynamicInfoPanel>(panel =>
                 {
                     // 面板位置
-                    panel.viewport.localPosition = Mouse.current.position.ReadValue();
+                    panel.viewport.localPosition = Mouse.current.position.ReadValue() / _system.parentCanvas.Value.GetComponent<Canvas>().scaleFactor;
                     panel.itemType = typeof(DynamicInfoItem);
                     panel.dataList = new List<object> 
                     { 

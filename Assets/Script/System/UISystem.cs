@@ -95,6 +95,7 @@ namespace UG20260527
         public UniTask<T> OpenSinglePanel<T>(Action<T> onInit = null, object userData = null, OpenPanelSetting? openPanelSetting = null) where T : PanelBase;
         public UniTask<PanelBase> OpenSinglePanel(Type type, Action<PanelBase> onInit = null, object userData = null, OpenPanelSetting? openPanelSetting = null);
         public UniTask CloseSinglePanel(PanelLayer layer = PanelLayer.NormalLayer, ClosePanelSetting? closePanelSetting = null);
+        public BindableProperty<Transform> parentCanvas { get; }
     }
 
     public class UISystem : AbstractSystem, IUISystem
@@ -113,7 +114,7 @@ namespace UG20260527
         private BindableProperty<int> pushingPanelCount { get; } = new BindableProperty<int>(0);
 
         // 画布面板
-        private Transform parentCanvas;
+        public BindableProperty<Transform> parentCanvas { get; private set; } = new BindableProperty<Transform>(null);
 
 
         protected override void OnInit()
@@ -121,7 +122,7 @@ namespace UG20260527
             // 获取 画布面板
             var obj = GameObject.Find("Canvas");
             if (obj == null) Debug.LogWarning("场景中没有 Canvas画布");
-            else parentCanvas = obj.transform;
+            else parentCanvas.Value = obj.transform;
 
             // 初始化Panel栈 和 层级对象
             _panelStacks = new Dictionary<PanelLayer, List<PanelBase>>();
@@ -129,7 +130,7 @@ namespace UG20260527
             foreach (PanelLayer layer in Enum.GetValues(typeof(PanelLayer)))
             {
                 Transform layarTrans = new GameObject(layer.ToString()).transform;
-                layarTrans.parent = parentCanvas;
+                layarTrans.parent = parentCanvas.Value;
                 layarTrans.localPosition = Vector3.zero;
                 _layerGameObjects.Add(layer, layarTrans);
             }
@@ -154,7 +155,7 @@ namespace UG20260527
             if (!_layerGameObjects.ContainsKey(layer))
             {
                 Transform layarTrans = new GameObject(layer.ToString()).transform;
-                layarTrans.parent = parentCanvas;
+                layarTrans.parent = parentCanvas.Value;
                 layarTrans.localPosition = Vector3.zero;
                 _layerGameObjects.Add(layer, layarTrans);
             }
@@ -228,6 +229,7 @@ namespace UG20260527
         {
             // 加载 Panel配置表
             uiConfig = await Addressables.LoadAssetAsync<UIConfig>(uiConfigPath).Task;
+            uiConfig.InitConfig();
         }
 
         // 根据Type 获取Panel预制体AssetRef
@@ -238,13 +240,13 @@ namespace UG20260527
                 await LoadUIConfig();
             }
 
-            if (!uiConfig.panelConfigDic.ContainsKey(typeof(T)))
+            if (!uiConfig.panelConfigDic.ContainsKey(typeof(T).Name))
             {
                 Debug.LogWarning($"{uiConfig.name} 配置表中没有 {typeof(T).Name} 资源");
                 return null;
             }
 
-            return uiConfig.panelConfigDic[typeof(T)].panelAssetRef;
+            return uiConfig.panelConfigDic[typeof(T).Name].panelAssetRef;
         }
 
         private async UniTask<AssetReference> GetPanelAssetRef(Type type)
@@ -254,13 +256,13 @@ namespace UG20260527
                 await LoadUIConfig();
             }
 
-            if (!uiConfig.panelConfigDic.ContainsKey(type))
+            if (!uiConfig.panelConfigDic.ContainsKey(type.Name))
             {
                 Debug.LogWarning($"{uiConfig.name} 配置表中没有 {type.Name} 资源");
                 return null;
             }
 
-            return uiConfig.panelConfigDic[type].panelAssetRef;
+            return uiConfig.panelConfigDic[type.Name].panelAssetRef;
         }
 
         // 根据Type 实例化Panel和脚本
@@ -271,14 +273,14 @@ namespace UG20260527
             if(panelAssetRef == null) return null;
 
             // 实例化Panel
-            var panel = await panelAssetRef.InstantiateAsync(parentCanvas, false).Task;
+            var panel = await panelAssetRef.InstantiateAsync(parentCanvas.Value, false).Task;
 
             // 添加 控制脚本
             T panelScript = panel.GetComponent<T>();
             if (panelScript == null) panelScript = panel.AddComponent<T>();
 
             // 初始化配置脚本
-            panelScript.panelConfig = uiConfig.panelConfigDic[typeof(T)];  // 面板配置：面板层级等
+            panelScript.panelConfig = uiConfig.panelConfigDic[typeof(T).Name];  // 面板配置：面板层级等
             await panelScript.OnInit(onInit, userData);
 
             return panelScript;
@@ -291,14 +293,14 @@ namespace UG20260527
             if (panelAssetRef == null) return null;
 
             // 实例化Panel
-            var panel = await panelAssetRef.InstantiateAsync(parentCanvas, false).Task;
+            var panel = await panelAssetRef.InstantiateAsync(parentCanvas.Value, false).Task;
 
             // 添加 控制脚本
             PanelBase panelScript = panel.GetComponent(type) as PanelBase;
             if (panelScript == null) panelScript = panel.AddComponent(type) as PanelBase;
 
             // 初始化配置脚本
-            panelScript.panelConfig = uiConfig.panelConfigDic[type];  // 面板配置：面板层级等
+            panelScript.panelConfig = uiConfig.panelConfigDic[type.Name];  // 面板配置：面板层级等
             await panelScript.OnInit(onInit, userData);
 
             return panelScript;
