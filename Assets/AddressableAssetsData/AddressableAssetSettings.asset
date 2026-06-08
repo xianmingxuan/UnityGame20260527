@@ -17,7 +17,7 @@ MonoBehaviour:
     serializedVersion: 2
     Hash: 00000000000000000000000000000000
   m_OptimizeCatalogSize: 0
-  m_BuildRemoteCatalog: 0
+  m_BuildRemoteCatalog: 1
   m_BundleLocalCatalog: 0
   m_CatalogRequestsTimeout: 0
   m_DisableCatalogUpdateOnStart: 0
@@ -44,7 +44,6 @@ MonoBehaviour:
   m_BuildAddressablesWithPlayerBuild: 0
   m_overridePlayerVersion: '[UnityEditor.PlayerSettings.bundleVersion]'
   m_GroupAssets:
-  - {fileID: 11400000, guid: e59ae31409e6ba24eb32716d199788da, type: 2}
   - {fileID: 11400000, guid: 9aec6704b9b790146900d964b25dbd05, type: 2}
   - {fileID: 11400000, guid: 50b8b2b4366d85d4c93c62527ed8c74f, type: 2}
   m_BuildSettings:
@@ -61,7 +60,7 @@ MonoBehaviour:
       - m_Id: 22c9d2aad8a0a5943b248987d0c9f731
         m_Value: '[UnityEngine.AddressableAssets.Addressables.BuildPath]/[BuildTarget]'
       - m_Id: 7f985a2ad681a864b9588aac9d74266b
-        m_Value: http://[PrivateIpAddress]:[HostingServicePort]
+        m_Value: http://127.0.0.1:3000
       - m_Id: a05a02e74c137834fb68729375f9af87
         m_Value: ServerData/[BuildTarget]
       - m_Id: b5f2e1b7902deb04ebd6ce7ed3e0bd12
@@ -108,5 +107,6 @@ MonoBehaviour:
     m_HostingServiceInfos: []
     m_Settings: {fileID: 11400000}
     m_NextInstanceId: 0
-    m_RegisteredServiceTypeRefs: []
+    m_RegisteredServiceTypeRefs:
+    - UnityEditor.AddressableAssets.HostingServices.HttpHostingService, Unity.Addressables.Editor
     m_PingTimeoutInMilliseconds: 5000
