@@ -6,6 +6,7 @@ public class Hello
 {
     public static void Run()
     {
-        Debug.Log("热更新代码运行");
+        Debug.Log("热更新代码运行1");
+        Debug.Log("热更新代码运行2");
     }
 }

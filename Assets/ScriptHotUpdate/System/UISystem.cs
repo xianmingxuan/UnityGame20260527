@@ -228,7 +228,9 @@ namespace UG20260527
         private async UniTask LoadUIConfig()
         {
             // 加载 Panel配置表
-            uiConfig = await Addressables.LoadAssetAsync<UIConfig>(uiConfigPath).Task;
+            var handle = Addressables.LoadAssetAsync<object>(uiConfigPath);
+            await handle.Task;
+            uiConfig = handle.Result as UIConfig;
             uiConfig.InitConfig();
         }
 

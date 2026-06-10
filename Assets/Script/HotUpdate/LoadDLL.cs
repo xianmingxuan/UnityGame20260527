@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using HybridCLR;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -41,21 +42,6 @@ namespace UG20260527
         {
             Debug.Log("进入加载场景");
 
-#if UNITY_EDITOR
-            // 编辑器状态下，无需下载，直接获取 热更新程序集 即可
-            Assembly hotUpdateAss = null;
-            hotUpdateAss = System.AppDomain.CurrentDomain.GetAssemblies().First( a => a.GetName().Name == "HotUpdate" );
-            // 反射 获取程序集中 Hello脚本，运行 静态函数Run
-            if (hotUpdateAss == null)
-            {
-                Debug.Log("加载 HotUpdate程序集 为空");
-                return;
-            }
-            Type type = hotUpdateAss.GetType("Hello");
-            type.GetMethod("Run").Invoke(null, null);
-            await UniTask.CompletedTask;
-#else
-            // 非编辑器下（游戏打包运行时），需要到 流送资源目录 加载 热更新程序集
             // 热更新
             var sizeHandle = Addressables.GetDownloadSizeAsync("default");
             await sizeHandle.Task;
@@ -73,19 +59,41 @@ namespace UG20260527
                 }
             }
 
-            // 获取程序集
-            Assembly hotUpdateAss = null;
-            hotUpdateAss = System.AppDomain.CurrentDomain.GetAssemblies().First( a => a.GetName().Name == "HotUpdate" );
-            // 反射 获取程序集中 Hello脚本，运行 静态函数Run
-            if (hotUpdateAss == null)
+            // 补充AOT元数据
+            List<string> aotDllList = new List<string>
             {
-                Debug.Log("加载 HotUpdate程序集 为空");
-                return;
+                "System.Core.dll",
+                "System.dll",
+                "UniTask.dll",
+                "Unity.Addressables.dll",
+                "Unity.InputSystem.dll",
+                "Unity.ResourceManager.dll",
+                "UnityEngine.CoreModule.dll",
+                "mscorlib.dll",
+            };
+            foreach(string aotDll in aotDllList)
+            {
+                Byte[] aotDllBytes = File.ReadAllBytes($"{Application.streamingAssetsPath}/MetaDataDlls/{aotDll}.bytes");
+                RuntimeApi.LoadMetadataForAOTAssembly(aotDllBytes, HomologousImageMode.SuperSet);
             }
-            Type type = hotUpdateAss.GetType("Hello");
-            type.GetMethod("Run").Invoke(null, null);
-#endif
 
+            // 加载程序集
+            TextAsset assemblyBytes = await Addressables.LoadAssetAsync<TextAsset>("Assets/AddressablesAsset/Assembly/StandaloneWindows64/HotUpdate.dll.bytes");
+            Assembly.Load(assemblyBytes.bytes);
+
+            // 进入新场景
+            var sceneHandle = Addressables.LoadSceneAsync("Assets/AddressablesAsset/Scenes/UIScene.unity", UnityEngine.SceneManagement.LoadSceneMode.Single, false);
+            await sceneHandle.Task;
+            if(sceneHandle.Status == AsyncOperationStatus.Succeeded)
+            {
+                Debug.Log($"准备进入场景：{sceneHandle.Result.Scene.name}");
+                await UniTask.WaitForSeconds(5f);
+                await sceneHandle.Result.ActivateAsync();
+            }
+            else if(sceneHandle.Status == AsyncOperationStatus.Failed)
+            {
+                Debug.Log($"加载场景：{sceneHandle.Result.Scene.name} 失败！！！");
+            }
         }
 
 
@@ -121,9 +129,6 @@ namespace UG20260527
             if(downloadHandle.Status == AsyncOperationStatus.Succeeded)
             {
                 Debug.Log("下载 热更新资源包 成功");
-                // 加载程序集
-                TextAsset assemblyBytes = await Addressables.LoadAssetAsync<TextAsset>("Assets/AddressablesAsset/Assembly/StandaloneWindows64/HotUpdate.dll.bytes");
-                Assembly.Load(assemblyBytes.bytes);
             }
             else
             {
