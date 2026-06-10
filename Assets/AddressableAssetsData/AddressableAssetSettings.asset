@@ -89,6 +89,9 @@ MonoBehaviour:
     - default
     - texture
     - config
+    - prefabs
+    - assembly
+    - scenes
   m_SchemaTemplates: []
   m_GroupTemplateObjects:
   - {fileID: 11400000, guid: 43c9a559090efac4996c4cd880d05aa1, type: 2}

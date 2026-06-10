@@ -18,22 +18,39 @@ MonoBehaviour:
   m_GUID: 7c90e241975fe59449dcfdb65bd0937f
   m_SerializeEntries:
   - m_GUID: 01eba82cb72b34a44b4412d24d49c319
-    m_Address: Assets/Config
+    m_Address: Assets/AddressablesAsset/Config
     m_ReadOnly: 0
     m_SerializedLabels:
     - config
+    - default
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 169a66aa76d9d2649bf16fd040851d93
-    m_Address: Assets/Prefabs
+    m_Address: Assets/AddressablesAsset/Prefabs
     m_ReadOnly: 0
     m_SerializedLabels:
     - default
+    - prefabs
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 3eb04a8b5a19daf45a32463fe576bf2c
-    m_Address: Assets/Art
+  - m_GUID: 21c694c25e7201e4d831076456517c1b
+    m_Address: Assets/AddressablesAsset/Scenes
     m_ReadOnly: 0
     m_SerializedLabels:
+    - default
+    - scenes
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 866675282fe32994b92c01a4802c5637
+    m_Address: Assets/AddressablesAsset/Art/Textures
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - default
     - texture
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8e076ec563e57c246ac8784e645fd7ca
+    m_Address: Assets/AddressablesAsset/Assembly
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - assembly
+    - default
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 1eeaa34c2f122524f9062fec01269caf, type: 2}

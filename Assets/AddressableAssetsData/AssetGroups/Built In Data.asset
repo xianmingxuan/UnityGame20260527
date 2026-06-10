@@ -20,7 +20,9 @@ MonoBehaviour:
   - m_GUID: EditorSceneList
     m_Address: EditorSceneList
     m_ReadOnly: 1
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - default
+    - scenes
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: Resources
     m_Address: Resources

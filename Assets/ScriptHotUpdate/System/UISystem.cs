@@ -103,7 +103,7 @@ namespace UG20260527
         /* -------------------------------------------------- 属性 -------------------------------------------------- */
 
         // Panel 配置表
-        private string uiConfigPath = "Assets/Config/UIConfig.asset";
+        private string uiConfigPath = "Assets/AddressablesAsset/Config/UIConfig.asset";
         private UIConfig uiConfig;
 
         // UI栈

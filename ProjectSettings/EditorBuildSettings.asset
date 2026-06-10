@@ -6,9 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/UIScene.unity
-    guid: 50b68d913c9516840975b6348011cbf6
-  - enabled: 1
     path: Assets/Scenes/HybirdScene.unity
     guid: d6a7d7544eaa20b4fa763b874147b9c7
   m_configObjects:
