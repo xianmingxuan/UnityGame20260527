@@ -40,9 +40,12 @@ namespace UG20260527
                 panelSC.InitPageActive("Toggle_Activity", false);
                 //panelSC.InitPageActive("Toggle_Bag", false);
                 //panelSC.InitPageActive("Toggle_BeginPlay", false);
-                panelSC.InitToggleGroup(1);
+                panelSC.InitToggleGroup(0);
             }, null, new OpenPanelSetting { isPushStack = false });
             mainPanel.transform.SetParent(GameObject.Find("NormalLayer").transform);
+
+            // 对象池系统
+            this.GetSystem<IPoolSystem>().ClearAll();
         }
 
         void Update()

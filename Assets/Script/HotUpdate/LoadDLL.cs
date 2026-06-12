@@ -10,7 +10,6 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.AddressableAssets.ResourceLocators;
 using UnityEngine.ResourceManagement.AsyncOperations;
-using static UG20260527.LoadDLL;
 
 namespace UG20260527
 {
@@ -49,8 +48,7 @@ namespace UG20260527
             {
                 if (sizeHandle.Result > 0)
                 {
-                    Debug.Log("需要 热更新");
-                    Debug.Log($"size = {sizeHandle.Result}");
+                    Debug.Log($"需要 热更新 包体大小 = {sizeHandle.Result}");
                     await Download();
                 }
                 else
@@ -58,6 +56,7 @@ namespace UG20260527
                     Debug.Log("不需要 热更新");
                 }
             }
+            Addressables.Release(sizeHandle);
 
             // 补充AOT元数据
             List<string> aotDllList = new List<string>
@@ -86,8 +85,8 @@ namespace UG20260527
             await sceneHandle.Task;
             if(sceneHandle.Status == AsyncOperationStatus.Succeeded)
             {
-                Debug.Log($"准备进入场景：{sceneHandle.Result.Scene.name}");
-                await UniTask.WaitForSeconds(5f);
+                Debug.Log($"即将进入场景：{sceneHandle.Result.Scene.name}");
+                await UniTask.WaitForSeconds(3f);
                 await sceneHandle.Result.ActivateAsync();
             }
             else if(sceneHandle.Status == AsyncOperationStatus.Failed)
@@ -134,6 +133,7 @@ namespace UG20260527
             {
                 Debug.Log("下载 热更新资源包 失败");
             }
+            Addressables.Release(downloadHandle);
         }
 
     }
