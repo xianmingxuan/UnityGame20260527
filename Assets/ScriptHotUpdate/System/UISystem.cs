@@ -234,8 +234,8 @@ namespace UG20260527
             uiConfig.InitConfig();
         }
 
-        // 根据Type 获取Panel预制体AssetRef
-        private async UniTask<AssetReference> GetPanelAssetRef<T>() where T : PanelBase
+        // 根据Type 获取Panel预制体路径
+        private async UniTask<string> GetPanelPrefabPath<T>() where T : PanelBase
         {
             if (uiConfig == null)
             {
@@ -248,10 +248,10 @@ namespace UG20260527
                 return null;
             }
 
-            return uiConfig.panelConfigDic[typeof(T).Name].panelAssetRef;
+            return uiConfig.panelConfigDic[typeof(T).Name].panelAssetPath;
         }
 
-        private async UniTask<AssetReference> GetPanelAssetRef(Type type)
+        private async UniTask<string> GetPanelPrefabPath(Type type)
         {
             if (uiConfig == null)
             {
@@ -264,18 +264,18 @@ namespace UG20260527
                 return null;
             }
 
-            return uiConfig.panelConfigDic[type.Name].panelAssetRef;
+            return uiConfig.panelConfigDic[type.Name].panelAssetPath;
         }
 
         // 根据Type 实例化Panel和脚本
         private async UniTask<T> CreatePanel<T>(Action<T> onInit, object userData) where T : PanelBase
         {
             // 获取Panel资源
-            AssetReference panelAssetRef = await GetPanelAssetRef<T>();
-            if(panelAssetRef == null) return null;
+            string panelPrefabPath = await GetPanelPrefabPath<T>();
+            if(string.IsNullOrEmpty(panelPrefabPath)) return null;
 
             // 实例化Panel
-            var panel = await panelAssetRef.InstantiateAsync(parentCanvas.Value, false).Task;
+            var panel = await Addressables.InstantiateAsync(panelPrefabPath, parentCanvas.Value, false).Task;
 
             // 添加 控制脚本
             T panelScript = panel.GetComponent<T>();
@@ -291,11 +291,11 @@ namespace UG20260527
         private async UniTask<PanelBase> CreatePanel(Type type, Action<PanelBase> onInit, object userData)
         {
             // 获取Panel资源
-            AssetReference panelAssetRef = await GetPanelAssetRef(type);
-            if (panelAssetRef == null) return null;
+            string panelPrefabPath = await GetPanelPrefabPath(type);
+            if (string.IsNullOrEmpty(panelPrefabPath)) return null;
 
             // 实例化Panel
-            var panel = await panelAssetRef.InstantiateAsync(parentCanvas.Value, false).Task;
+            var panel = await Addressables.InstantiateAsync(panelPrefabPath, parentCanvas.Value, false).Task;
 
             // 添加 控制脚本
             PanelBase panelScript = panel.GetComponent(type) as PanelBase;
