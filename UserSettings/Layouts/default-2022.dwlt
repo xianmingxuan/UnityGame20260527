@@ -19,7 +19,7 @@ MonoBehaviour:
     width: 2048
     height: 1108.8
   m_ShowMode: 4
-  m_Title: Inspector
+  m_Title: Hierarchy
   m_RootView: {fileID: 2}
   m_MinSize: {x: 875, y: 300}
   m_MaxSize: {x: 10000, y: 10000}
@@ -100,7 +100,7 @@ MonoBehaviour:
   m_MinSize: {x: 400, y: 100}
   m_MaxSize: {x: 32384, y: 16192}
   vertical: 0
-  controlID: 160
+  controlID: 87
   draggingID: 0
 --- !u!114 &5
 MonoBehaviour:
@@ -220,8 +220,8 @@ MonoBehaviour:
     y: 0
     width: 484
     height: 1058.8
-  m_MinSize: {x: 275, y: 50}
-  m_MaxSize: {x: 4000, y: 4000}
+  m_MinSize: {x: 276, y: 71}
+  m_MaxSize: {x: 4001, y: 4021}
   m_ActualView: {fileID: 15}
   m_Panes:
   - {fileID: 15}
@@ -274,8 +274,8 @@ MonoBehaviour:
     y: 542.4
     width: 968
     height: 516.4
-  m_MinSize: {x: 200, y: 200}
-  m_MaxSize: {x: 4000, y: 4000}
+  m_MinSize: {x: 201, y: 221}
+  m_MaxSize: {x: 4001, y: 4021}
   m_ActualView: {fileID: 17}
   m_Panes:
   - {fileID: 17}
@@ -318,8 +318,8 @@ MonoBehaviour:
   m_GroupEditor:
     m_TreeState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: 13351790
-      m_LastClickedID: -1877527277
+      m_SelectedIDs: 
+      m_LastClickedID: 0
       m_ExpandedIDs: 13351790
       m_RenameOverlay:
         m_UserAcceptedRename: 0
@@ -492,7 +492,7 @@ MonoBehaviour:
       scrollPos: {x: 0, y: 0}
       m_SelectedIDs: 
       m_LastClickedID: 0
-      m_ExpandedIDs: d09affffda9affffe89affff329effffc29effffc49effffca9effffe89ffffffe9fffff06a0ffff0ca0ffff62a0ffffdea2ffff3aa7ffff48a7ffff0aa8ffff76aaffffeeaaffff4cb3ffff5eb3ffff80b3ffff86b3ffffb8c4ffffbec4ffffd4d1ffff24d2ffffc8d3ffffeed3ffff02d4ffff08d4ffff12d4ffffc6ddffff08fbffff
+      m_ExpandedIDs: 0a3effff1c3effff1e3effff243effff1841ffff6245ffffb045ffff5047ffff7847ffff7e47ffffe047ffffee47fffff447fffffa47ffffda48fffff448ffff2249ffff3049ffffa476ffff7697ffff20fbfffff4ffffffd86e0000e26e0000e66e0000
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -608,7 +608,7 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/ScriptHotUpdate/UI/DynamicInfoPanel
+    - Assets/HybridCLRGenerate
     m_Globs: []
     m_OriginalText: 
     m_ImportLogFlags: 0
@@ -625,7 +625,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: ec5e0000
     m_LastClickedID: 24300
-    m_ExpandedIDs: 000000004468000046680000486800004a6800004c6800004e68000050680000526800005468000056680000586800005a6800005c6800005e6800006068000062680000
+    m_ExpandedIDs: 000000001468000016680000186800001a6800001c6800001e68000020680000226800002468000026680000286800002a6800002c680000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -653,18 +653,18 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: ffffffff0000000044680000466800004a680000526800005468000056680000586800005a6800005c68000062680000a8680000e068000048710000
+    m_ExpandedIDs: ffffffff000000001468000016680000186800001a6800001e68000020680000266800002c680000886800008e6800009a6800009e680000a2680000ae680000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
-      m_Name: GameRoot_UIScene
-      m_OriginalName: GameRoot_UIScene
+      m_Name: link
+      m_OriginalName: link
       m_EditFieldRect:
         serializedVersion: 2
         x: 0
         y: 0
         width: 0
         height: 0
-      m_UserData: 17462
+      m_UserData: 29734
       m_IsWaitingForDelay: 0
       m_IsRenaming: 0
       m_OriginalEventType: 0

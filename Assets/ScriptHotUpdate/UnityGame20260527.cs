@@ -12,6 +12,7 @@ namespace UG20260527
             RegisterSystem<IInputSystem>(new InputSystem());
             RegisterSystem<IUISystem>(new UISystem());
             RegisterSystem<IPoolSystem>(new PoolSystem());
+            RegisterSystem<IResourceSystem>(new ResourceSystem());
 
             // 数据层
             RegisterModel<IScoreModel>(new ScoreModel());

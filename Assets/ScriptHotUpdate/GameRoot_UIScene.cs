@@ -45,7 +45,7 @@ namespace UG20260527
             mainPanel.transform.SetParent(GameObject.Find("NormalLayer").transform);
 
             // 对象池系统
-            this.GetSystem<IPoolSystem>().ClearAll();
+            //this.GetSystem<IPoolSystem>().ClearAll();
         }
 
         void Update()

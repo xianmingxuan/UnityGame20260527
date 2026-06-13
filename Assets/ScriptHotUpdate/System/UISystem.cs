@@ -109,7 +109,7 @@ namespace UG20260527
         // UI栈
         private Dictionary<PanelLayer, List<PanelBase>> _panelStacks;
         // 层级对象，Panel创建后需要挂载到目标层级gameObject下
-        private Dictionary<PanelLayer, Transform> _layerGameObjects;
+        private Dictionary<PanelLayer, RectTransform> _layerGameObjects;
         // 正在加载 准备入栈的Panel数量
         private BindableProperty<int> pushingPanelCount { get; } = new BindableProperty<int>(0);
 
@@ -126,13 +126,22 @@ namespace UG20260527
 
             // 初始化Panel栈 和 层级对象
             _panelStacks = new Dictionary<PanelLayer, List<PanelBase>>();
-            _layerGameObjects = new Dictionary<PanelLayer, Transform>();
+            _layerGameObjects = new Dictionary<PanelLayer, RectTransform>();
             foreach (PanelLayer layer in Enum.GetValues(typeof(PanelLayer)))
             {
-                Transform layarTrans = new GameObject(layer.ToString()).transform;
-                layarTrans.parent = parentCanvas.Value;
-                layarTrans.localPosition = Vector3.zero;
-                _layerGameObjects.Add(layer, layarTrans);
+                // 创建 层级对象
+                GameObject layerObj = new GameObject(layer.ToString());
+                layerObj.AddComponent<RectTransform>();
+                // 层级对象 设置：父对象为Canvas，全屏拉伸，上下左右间隔为0，本地坐标为0，本地缩放为1
+                RectTransform layerTrans = layerObj.transform as RectTransform;
+                layerTrans.SetParent(parentCanvas.Value);
+                layerTrans.anchorMin = Vector2.zero;
+                layerTrans.anchorMax = Vector2.one;
+                layerTrans.offsetMin = Vector2.zero;
+                layerTrans.offsetMax = Vector2.zero;
+                layerTrans.localPosition = Vector3.zero;
+                layerTrans.localScale = Vector3.one;
+                _layerGameObjects.Add(layer, layerTrans);
             }
 
             // 加载中Panel数量
@@ -154,10 +163,19 @@ namespace UG20260527
             }
             if (!_layerGameObjects.ContainsKey(layer))
             {
-                Transform layarTrans = new GameObject(layer.ToString()).transform;
-                layarTrans.parent = parentCanvas.Value;
-                layarTrans.localPosition = Vector3.zero;
-                _layerGameObjects.Add(layer, layarTrans);
+                // 创建 层级对象
+                GameObject layerObj = new GameObject(layer.ToString());
+                layerObj.AddComponent<RectTransform>();
+                // 层级对象 设置：父对象为Canvas，全屏拉伸，上下左右间隔为0，本地坐标为0，本地缩放为1
+                RectTransform layerTrans = layerObj.transform as RectTransform;
+                layerTrans.SetParent(parentCanvas.Value);
+                layerTrans.anchorMin = Vector2.zero;
+                layerTrans.anchorMax = Vector2.one;
+                layerTrans.offsetMin = Vector2.zero;
+                layerTrans.offsetMax = Vector2.zero;
+                layerTrans.localPosition = Vector3.zero;
+                layerTrans.localScale = Vector3.one;
+                _layerGameObjects.Add(layer, layerTrans);
             }
             return _panelStacks[layer];
         }
@@ -169,6 +187,7 @@ namespace UG20260527
             List<PanelBase> panelStack = GetOrAddPanelStack(panelScript.panelConfig.panelLayer);
             panelScript.transform.SetParent(_layerGameObjects[panelScript.panelConfig.panelLayer]);
             panelScript.transform.localPosition = Vector3.zero;
+            panelScript.transform.localScale = Vector3.one;
 
             // 冻结栈顶
             if (panelStack.Count > 0) panelStack[panelStack.Count - 1].OnPause();
@@ -275,7 +294,10 @@ namespace UG20260527
             if(string.IsNullOrEmpty(panelPrefabPath)) return null;
 
             // 实例化Panel
-            var panel = await Addressables.InstantiateAsync(panelPrefabPath, parentCanvas.Value, false).Task;
+            //var panel = await Addressables.InstantiateAsync(panelPrefabPath, parentCanvas.Value, false).Task;
+            var panel = await this.GetSystem<IResourceSystem>().LoadAndInstantiateAsync<GameObject>(panelPrefabPath, parentCanvas.Value, false);
+            panel.transform.localPosition = Vector3.zero;
+            panel.transform.localScale = Vector3.one;
 
             // 添加 控制脚本
             T panelScript = panel.GetComponent<T>();
@@ -295,7 +317,10 @@ namespace UG20260527
             if (string.IsNullOrEmpty(panelPrefabPath)) return null;
 
             // 实例化Panel
-            var panel = await Addressables.InstantiateAsync(panelPrefabPath, parentCanvas.Value, false).Task;
+            //var panel = await Addressables.InstantiateAsync(panelPrefabPath, parentCanvas.Value, false).Task;
+            var panel = await this.GetSystem<IResourceSystem>().LoadAndInstantiateAsync<GameObject>(panelPrefabPath, parentCanvas.Value, false);
+            panel.transform.localPosition = Vector3.zero;
+            panel.transform.localScale = Vector3.one;
 
             // 添加 控制脚本
             PanelBase panelScript = panel.GetComponent(type) as PanelBase;
@@ -494,7 +519,9 @@ namespace UG20260527
         /// </summary>
         public virtual void OnClose()
         {
-            GameObject.Destroy(gameObject);
+            //GameObject.Destroy(gameObject);
+            // 回收
+            this.GetSystem<IResourceSystem>().Recycle(gameObject);
         }
 
 

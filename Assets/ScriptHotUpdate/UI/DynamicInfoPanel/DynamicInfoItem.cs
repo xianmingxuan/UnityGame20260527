@@ -53,5 +53,12 @@ namespace UG20260527
                 });
             });
         }
+
+        public override void OnClose()
+        {
+            // 移除所有监听
+            GetComponentInChildren<Button>("Button").onClick.RemoveAllListeners();
+            base.OnClose();
+        }
     }
 }

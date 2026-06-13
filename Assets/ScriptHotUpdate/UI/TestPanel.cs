@@ -13,9 +13,14 @@ namespace UG20260527
             GetComponentInChildren<Button>("BtnTest")?.onClick.AddListener(() =>
             {
                 Debug.Log("点击测试面板");
-                //this.GetSystem<IUISystem>().CloseSinglePanel(panelConfig.panelLayer);
-                this.GetSystem<IUISystem>().CloseSinglePanel(PanelLayer.BackgroundLayer, new ClosePanelSetting { panelShouldClose = this});
+                this.GetSystem<IUISystem>().CloseSinglePanel(panelConfig.panelLayer);
             });
+        }
+
+        public override void OnClose()
+        {
+            GetComponentInChildren<Button>("BtnTest")?.onClick.RemoveAllListeners();
+            base.OnClose();
         }
     }
 }
