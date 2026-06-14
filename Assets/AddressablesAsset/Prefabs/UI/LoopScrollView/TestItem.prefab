@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4565824528983276023}
   - component: {fileID: 5621717612109460222}
   - component: {fileID: 5103718889795001318}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -91,7 +91,7 @@ GameObject:
   - component: {fileID: 2105621013420523737}
   - component: {fileID: 6917839806117028086}
   - component: {fileID: 1769996393141981204}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -209,7 +209,7 @@ GameObject:
   m_Component:
   - component: {fileID: 101904669448416297}
   - component: {fileID: 8756344432995331085}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: TestItem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -251,13 +251,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   panelConfig:
-    panelScript: {fileID: 0}
     panelLayer: 1
-    panelAssetRef:
-      m_AssetGUID: 
-      m_SubObjectName: 
-      m_SubObjectType: 
-      m_EditorAssetChanged: 0
+    panelAssetPath: 
+    panelTypeName: 
   canvasGroup: {fileID: 0}
   isPause: 0
 --- !u!1 &9146550938263926780
@@ -271,7 +267,7 @@ GameObject:
   - component: {fileID: 8940978418132457946}
   - component: {fileID: 5308685412500601063}
   - component: {fileID: 7469907253297269455}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}

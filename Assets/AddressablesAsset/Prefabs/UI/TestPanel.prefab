@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 63017731332253881}
   - component: {fileID: 8737061250255057928}
   - component: {fileID: 8501136632348425567}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: BtnTest
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -130,7 +130,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7879246518370190174}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: TestPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -169,7 +169,7 @@ GameObject:
   - component: {fileID: 8169973252222832932}
   - component: {fileID: 4987016218001668605}
   - component: {fileID: 1053453631278373113}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Panel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -244,7 +244,7 @@ GameObject:
   - component: {fileID: 8149114087015082414}
   - component: {fileID: 7631978999546129610}
   - component: {fileID: 1958266709287621856}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Text (Legacy)
   m_TagString: Untagged
   m_Icon: {fileID: 0}

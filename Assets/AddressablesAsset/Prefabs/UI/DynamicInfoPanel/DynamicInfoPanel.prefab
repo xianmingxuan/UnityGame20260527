@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3380206459927806154}
   - component: {fileID: 5156286520525737713}
   - component: {fileID: 1814274596010780382}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -131,7 +131,7 @@ GameObject:
   - component: {fileID: 7979406951151944177}
   - component: {fileID: 4691204436514376726}
   - component: {fileID: 9077445848347994336}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Content
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -206,7 +206,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1210460690666321817}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: DynamicInfoPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -243,7 +243,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5976031704512870329}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Viewport
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -282,7 +282,7 @@ GameObject:
   - component: {fileID: 3836823530838982733}
   - component: {fileID: 6887924541064934755}
   - component: {fileID: 1853397506866543268}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: 'Background '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -355,7 +355,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1647045898503198559}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Anchor
   m_TagString: Untagged
   m_Icon: {fileID: 0}

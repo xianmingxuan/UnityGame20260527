@@ -2,9 +2,7 @@
 using QFramework;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
 using UnityEngine.Pool;
 
 namespace UG20260527
@@ -29,8 +27,8 @@ namespace UG20260527
         private Dictionary<GameObject, IObjectPool<GameObject>> _activePool = new Dictionary<GameObject, IObjectPool<GameObject>>();
 
         // 预加载对象存储Root
-        private string _preloadRootName = "preloadRoot";
-        private Transform _preloadRoot;
+        private string _preloadPoolName = "preloadPoolRoot";
+        private Transform _preloadPoolRoot;
 
         protected override void OnInit()
         {
@@ -41,11 +39,12 @@ namespace UG20260527
         // 初始化 预加载Root
         private void InitPreloadRoot()
         {
-            if (_preloadRoot == null)
+            if (_preloadPoolRoot == null)
             {
-                var obj = GameObject.Find(_preloadRootName);
-                if (obj == null) obj = new GameObject(_preloadRootName);
-                _preloadRoot = obj.transform;
+                var obj = GameObject.Find(_preloadPoolName);
+                if (obj == null) obj = new GameObject(_preloadPoolName);
+                _preloadPoolRoot = obj.transform;
+                //GameObject.DontDestroyOnLoad(obj);
             }
         }
 
@@ -105,7 +104,7 @@ namespace UG20260527
                 for(int i = 0; i < defaultCount; i++)
                 {
                     tempObj = pool.Get();
-                    tempObj.transform.SetParent(_preloadRoot);
+                    tempObj.transform.SetParent(_preloadPoolRoot);
                     tempObj.transform.localPosition = Vector3.zero;
                     tempList.Add(tempObj);
                 }

@@ -28,6 +28,7 @@ namespace UG20260527
             if (Target == null) return;
 
             // 死区
+            if(Cam == null) Cam = Camera.main;
             if (Vector3.Distance(Cam.transform.position, Target.position + Offset) < 0.01f) return;
 
             // 插值 摄像机原pos 和 目标pos

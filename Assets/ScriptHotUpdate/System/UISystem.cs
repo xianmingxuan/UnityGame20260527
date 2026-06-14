@@ -132,6 +132,7 @@ namespace UG20260527
                 // 创建 层级对象
                 GameObject layerObj = new GameObject(layer.ToString());
                 layerObj.AddComponent<RectTransform>();
+                layerObj.layer = LayerMask.NameToLayer("UI");
                 // 层级对象 设置：父对象为Canvas，全屏拉伸，上下左右间隔为0，本地坐标为0，本地缩放为1
                 RectTransform layerTrans = layerObj.transform as RectTransform;
                 layerTrans.SetParent(parentCanvas.Value);
@@ -166,6 +167,7 @@ namespace UG20260527
                 // 创建 层级对象
                 GameObject layerObj = new GameObject(layer.ToString());
                 layerObj.AddComponent<RectTransform>();
+                layerObj.layer = LayerMask.NameToLayer("UI");
                 // 层级对象 设置：父对象为Canvas，全屏拉伸，上下左右间隔为0，本地坐标为0，本地缩放为1
                 RectTransform layerTrans = layerObj.transform as RectTransform;
                 layerTrans.SetParent(parentCanvas.Value);

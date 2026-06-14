@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 8278711179640546459}
   - component: {fileID: 4559337570614100926}
   - component: {fileID: 6780866848919432796}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -129,7 +129,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3285081176113979861}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: DynamicInfoItem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -169,7 +169,7 @@ GameObject:
   - component: {fileID: 5171797622077685165}
   - component: {fileID: 8276508804300839268}
   - component: {fileID: 8378852378896333288}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: 'Background '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -244,7 +244,7 @@ GameObject:
   - component: {fileID: 5087323334069567132}
   - component: {fileID: 2063319406034797149}
   - component: {fileID: 6242553294664135731}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}

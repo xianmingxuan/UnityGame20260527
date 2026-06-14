@@ -9,12 +9,13 @@ namespace UG20260527
     public class PlayerSpawnPoint : MonoBehaviour, IController
     {
         [Tooltip("玩家资源 弱引用")]
-        public AssetReference PlayerPrefab;
+        public GameObject playerPrefab;
 
-        async void Start()
+        void Start()
         {
-            GameObject pre = await PlayerPrefab.LoadAssetAsync<GameObject>().Task;
-            GameObject obj = Instantiate(pre, transform.position, transform.rotation, transform.parent);
+            GameObject obj = this.GetSystem<IResourceSystem>().Instantiate(playerPrefab, transform.parent);
+            obj.transform.localPosition = transform.localPosition;
+            obj.transform.localRotation = transform.localRotation;
         }
 
         IArchitecture IBelongToArchitecture.GetArchitecture()
