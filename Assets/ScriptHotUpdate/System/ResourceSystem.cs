@@ -4,6 +4,7 @@ using System;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.ResourceManagement.ResourceProviders;
 using UnityEngine.SceneManagement;
 
@@ -53,6 +54,7 @@ namespace UG20260527
         /// <returns>不受对象池管理，直接销毁，返回false</returns>
         public UniTask<bool> Recycle(GameObject obj, float delaySecond, Action<GameObject> actionOnRecycle = null);
 
+        public AsyncOperationHandle<SceneInstance> LoadScenceHandleAsync(string path, LoadSceneMode loadSceneMode, bool activeOnLoad);
         public UniTask<SceneInstance> LoadScenceAsync(string path, LoadSceneMode loadSceneMode = LoadSceneMode.Single, bool activeOnLoad = true);
         public void LoadScenceAsync(string path, LoadSceneMode loadSceneMode = LoadSceneMode.Single, bool activeOnLoad = true, Action<SceneInstance> callBack = null);
         public UniTask UnLoadScenceAsync(SceneInstance instance);
@@ -145,6 +147,12 @@ namespace UG20260527
 
 
         /* -------------------------------------------------- 场景资源 -------------------------------------------------- */
+
+        // 加载场景（直接返回句柄，用于实现加载进度条）
+        AsyncOperationHandle<SceneInstance> IResourceSystem.LoadScenceHandleAsync(string path, LoadSceneMode loadSceneMode, bool activeOnLoad)
+        {
+            return Addressables.LoadSceneAsync(path, loadSceneMode, activeOnLoad);
+        }
 
         // 加载场景
         async UniTask<SceneInstance> IResourceSystem.LoadScenceAsync(string path, LoadSceneMode loadSceneMode, bool activeOnLoad)

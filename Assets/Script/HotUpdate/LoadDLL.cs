@@ -81,7 +81,7 @@ namespace UG20260527
             Assembly.Load(assemblyBytes.bytes);
 
             // 进入新场景
-            var sceneHandle = Addressables.LoadSceneAsync("Assets/AddressablesAsset/Scenes/UIScene.unity", UnityEngine.SceneManagement.LoadSceneMode.Single, false);
+            var sceneHandle = Addressables.LoadSceneAsync("Assets/AddressablesAsset/Scenes/InitScene.unity", UnityEngine.SceneManagement.LoadSceneMode.Single, false);
             await sceneHandle.Task;
             if(sceneHandle.Status == AsyncOperationStatus.Succeeded)
             {

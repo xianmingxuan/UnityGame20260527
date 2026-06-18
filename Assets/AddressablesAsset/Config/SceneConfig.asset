@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58fff08c6e70d004c84fc7e7d18a9c96, type: 3}
+  m_Name: SceneConfig
+  m_EditorClassIdentifier: 
+  items:
+  - sceneController: {fileID: 11500000, guid: 7a3bbebc9ef41b242b015a882c104453, type: 3}
+    sceneAsset: {fileID: 102900000, guid: 50b68d913c9516840975b6348011cbf6, type: 3}
+    sceneControllerTypeName: UISceneController
+  - sceneController: {fileID: 11500000, guid: 90302c65b73e70547a5aea0232e26004, type: 3}
+    sceneAsset: {fileID: 102900000, guid: 9fc0d4010bbf28b4594072e72b8655ab, type: 3}
+    sceneControllerTypeName: PlaySceneController
+  sceneConfigDataList:
+  - sceneControllerTypeName: UISceneController
+    sceneAssetPath: Assets/AddressablesAsset/Scenes/UIScene.unity
+  - sceneControllerTypeName: PlaySceneController
+    sceneAssetPath: Assets/AddressablesAsset/Scenes/PlayScene.unity

@@ -1,22 +1,25 @@
-﻿using QFramework;
+﻿using Cysharp.Threading.Tasks;
+using QFramework;
+using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.Rendering.VirtualTexturing;
-using UnityEngine.UI;
+using UnityEngine.ResourceManagement.ResourceProviders;
 
 namespace UG20260527
 {
-    public class GameRoot_UIScene : MonoBehaviour, IController
+    public class UISceneController : SceneControllerBase
     {
-        
+        private List<IUnRegister> _unRegisterList = new List<IUnRegister>();
 
-        private async void Start()
+
+        public override async UniTask OnEnter(SceneInstance sceneInstance)
         {
+            await base.OnEnter(sceneInstance);
+
             // 输入系统：切换为UIMap
             this.GetSystem<IInputSystem>().SwitchActionMap("UIMap");
-            this.RegisterEvent<InputActionEvent>(e =>
+            var unRegisterHandle = this.RegisterEvent<InputActionEvent>(e =>
             {
                 if (!string.IsNullOrEmpty(e.mapName) && e.mapName == "UIMap")
                 {
@@ -31,7 +34,8 @@ namespace UG20260527
                             break;
                     }
                 }
-            }).UnRegisterWhenGameObjectDestroyed(gameObject);
+            });
+            _unRegisterList.Add(unRegisterHandle);
 
             // UI系统：创建 MainPanel
             var mainPanel = await this.GetSystem<IUISystem>().OpenSinglePanel<MainPanel>(panelSC =>
@@ -40,24 +44,32 @@ namespace UG20260527
                 panelSC.InitPageActive("Toggle_Activity", false);
                 //panelSC.InitPageActive("Toggle_Bag", false);
                 //panelSC.InitPageActive("Toggle_BeginPlay", false);
-                panelSC.InitToggleGroup(0);
+                panelSC.InitToggleGroup(1);
             }, null, new OpenPanelSetting { isPushStack = false });
             mainPanel.transform.SetParent(GameObject.Find("NormalLayer").transform);
 
+            return;
         }
 
-        void Update()
+        public override void OnPreExit()
         {
-            //Debug.Log(Mouse.current.position.ReadValue());
+            base.OnPreExit();
 
-            //var system = this.GetSystem<IUISystem>();
-            //if (system != null) Debug.Log(system.parentCanvas.Value.GetComponent<Canvas>().scaleFactor);
+            // 注销监听
+            if (_unRegisterList != null && _unRegisterList.Count > 0)
+            {
+                foreach (var unRegister in _unRegisterList)
+                {
+                    unRegister.UnRegister();
+                }
+            }
         }
 
-        IArchitecture IBelongToArchitecture.GetArchitecture()
-        {
-            return UnityGame20260527.Interface;
-        }
+
+
+
+
+
+
     }
 }
-

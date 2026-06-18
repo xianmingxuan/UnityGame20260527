@@ -98,7 +98,7 @@ namespace UG20260527
         [ContextMenu("刷新UI配置")]
         public void UpdataUIConfig()
         {
-            Debug.Log("刷新UI配置");
+            Debug.Log("刷新UIConfig");
             if (serializePanelConfigList != null && serializePanelConfigList.Count > 0) serializePanelConfigList.Clear();
             foreach (var item in panelConfigList)
             {

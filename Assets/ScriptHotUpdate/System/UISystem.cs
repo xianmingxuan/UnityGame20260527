@@ -2,6 +2,7 @@
 using QFramework;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
@@ -119,32 +120,6 @@ namespace UG20260527
 
         protected override void OnInit()
         {
-            // 获取 画布面板
-            var obj = GameObject.Find("Canvas");
-            if (obj == null) Debug.LogWarning("场景中没有 Canvas画布");
-            else parentCanvas.Value = obj.transform;
-
-            // 初始化Panel栈 和 层级对象
-            _panelStacks = new Dictionary<PanelLayer, List<PanelBase>>();
-            _layerGameObjects = new Dictionary<PanelLayer, RectTransform>();
-            foreach (PanelLayer layer in Enum.GetValues(typeof(PanelLayer)))
-            {
-                // 创建 层级对象
-                GameObject layerObj = new GameObject(layer.ToString());
-                layerObj.AddComponent<RectTransform>();
-                layerObj.layer = LayerMask.NameToLayer("UI");
-                // 层级对象 设置：父对象为Canvas，全屏拉伸，上下左右间隔为0，本地坐标为0，本地缩放为1
-                RectTransform layerTrans = layerObj.transform as RectTransform;
-                layerTrans.SetParent(parentCanvas.Value);
-                layerTrans.anchorMin = Vector2.zero;
-                layerTrans.anchorMax = Vector2.one;
-                layerTrans.offsetMin = Vector2.zero;
-                layerTrans.offsetMax = Vector2.zero;
-                layerTrans.localPosition = Vector3.zero;
-                layerTrans.localScale = Vector3.one;
-                _layerGameObjects.Add(layer, layerTrans);
-            }
-
             // 加载中Panel数量
             pushingPanelCount.Register(value =>
             {
@@ -245,13 +220,45 @@ namespace UG20260527
 
         /* -------------------------------------------------- API函数 -------------------------------------------------- */
 
+        // 初始化 画布面板和层级GameObject
+        private void InitCanvas()
+        {
+            if (parentCanvas.Value != null) return;
+
+            // 获取 画布面板
+            var obj = GameObject.Find("Canvas");
+            if (obj == null) Debug.LogWarning("场景中没有 Canvas画布");
+            else parentCanvas.Value = obj.transform;
+
+            // 初始化Panel栈 和 层级对象
+            _panelStacks = new Dictionary<PanelLayer, List<PanelBase>>();
+            _layerGameObjects = new Dictionary<PanelLayer, RectTransform>();
+            foreach (PanelLayer layer in Enum.GetValues(typeof(PanelLayer)))
+            {
+                // 创建 层级对象
+                GameObject layerObj = new GameObject(layer.ToString());
+                layerObj.AddComponent<RectTransform>();
+                layerObj.layer = LayerMask.NameToLayer("UI");
+                // 层级对象 设置：父对象为Canvas，全屏拉伸，上下左右间隔为0，本地坐标为0，本地缩放为1
+                RectTransform layerTrans = layerObj.transform as RectTransform;
+                layerTrans.SetParent(parentCanvas.Value);
+                layerTrans.anchorMin = Vector2.zero;
+                layerTrans.anchorMax = Vector2.one;
+                layerTrans.offsetMin = Vector2.zero;
+                layerTrans.offsetMax = Vector2.zero;
+                layerTrans.localPosition = Vector3.zero;
+                layerTrans.localScale = Vector3.one;
+                _layerGameObjects.Add(layer, layerTrans);
+            }
+        }
+
         // 加载 UI配置表
         private async UniTask LoadUIConfig()
         {
             // 加载 Panel配置表
-            var handle = Addressables.LoadAssetAsync<object>(uiConfigPath);
-            await handle.Task;
-            uiConfig = handle.Result as UIConfig;
+            //var handle = Addressables.LoadAssetAsync<object>(uiConfigPath);
+            object obj = await this.GetSystem<IResourceSystem>().LoadAssetsAsync<object>(uiConfigPath);
+            uiConfig = obj as UIConfig;
             uiConfig.InitConfig();
         }
 
@@ -340,9 +347,11 @@ namespace UG20260527
 
         async UniTask<T> IUISystem.OpenSinglePanel<T>(Action<T> onInit, object userData, OpenPanelSetting? openPanelSetting)
         {
+            // 初始化 画布面板和层级GameObject
+            InitCanvas();
+
             // OpenPanel时的特殊配置
             OpenPanelSetting setting = openPanelSetting ?? OpenPanelSetting.DefaultValue();
-
 
             // 不入栈（由创建者自己管理，例如：子面板）
             if (!setting.isPushStack)
@@ -374,6 +383,9 @@ namespace UG20260527
 
         async UniTask<PanelBase> IUISystem.OpenSinglePanel(Type type, Action<PanelBase> onInit, object userData, OpenPanelSetting? openPanelSetting)
         {
+            // 初始化 画布面板和层级GameObject
+            InitCanvas();
+
             // OpenPanel时的特殊配置
             OpenPanelSetting setting = openPanelSetting ?? OpenPanelSetting.DefaultValue();
 

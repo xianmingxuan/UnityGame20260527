@@ -44,7 +44,7 @@ namespace UG20260527
                         panel_BeginPlay = await this.GetSystem<IUISystem>().OpenSinglePanel<BeginGamePanel>(panelSC =>
                         {
                             panelSC.transform.SetParent(GetComponentInChildren<Transform>("PageContext"));
-                        }, null, new OpenPanelSetting { isPushStack = false});
+                        }, new BeginGamePanelData(this), new OpenPanelSetting { isPushStack = false});
                     }
                     panel_BeginPlay.gameObject.SetActive(true);
                 }
