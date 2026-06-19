@@ -11,6 +11,8 @@ namespace UG20260527
         public override UniTask OnEnter(SceneInstance sceneInstance)
         {
             return base.OnEnter(sceneInstance);
+
+
         }
     }
 }

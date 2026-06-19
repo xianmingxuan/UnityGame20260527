@@ -44,13 +44,10 @@ namespace UG20260527
         {
             base.OnOpen();
 
-            GetComponentInChildren<Button>("Btn_Fight")?.onClick.AddListener(async () =>
+            GetComponentInChildren<Button>("Btn_Fight")?.onClick.AddListener( () =>
             {
-                Debug.Log("加载场景");
-                var mainPanel = owner as MainPanel;
-                mainPanel.InitToggleGroup(2);
-                await this.GetSystem<ISceneSystem>().EnterScenceAsync<PlaySceneController>();
-                await this.GetSystem<IUISystem>().OpenSinglePanel<HUDPanel>();
+                // 发送命令：进入 PlayScene
+                this.SendCommand<EnterPlaySceneCommand>();
             });
         }
 

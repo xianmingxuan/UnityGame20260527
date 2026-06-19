@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using QFramework;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -86,7 +87,7 @@ namespace UG20260527
         private async UniTask LoadSceneConfig()
         {
             // 加载 Panel配置表
-            object obj = await this.GetSystem<IResourceSystem>().LoadAssetsAsync<object>(sceneConfigPath);
+            object obj = await this.GetSystem<IResourceSystem>().LoadAssetAsync<object>(sceneConfigPath);
             sceneConfig = obj as SceneConfig;
             sceneConfig.InitConfig();
         }
@@ -123,7 +124,7 @@ namespace UG20260527
             // 创建 场景管理器
             T sceneController = new T();
             _sceneControllerDict.Add(typeof(T).Name, sceneController);
-            await sceneController.OnInit();
+            await sceneController.OnInit(sceneConfig.sceneConfigDict[typeof(T).Name]);
             await sceneController.OnPreEnter();
 
             // 加载并进入场景
@@ -158,7 +159,7 @@ namespace UG20260527
             {
                 Debug.LogWarning($"{typeof(T).Name} 场景资源和控制器 已被加载并创建，不能重复创建");
                 return new LoadSceneControllerPayLoad<T>(
-                    new AsyncOperationHandle<SceneInstance>(), 
+                    new AsyncOperationHandle<SceneInstance>(),
                     _sceneControllerDict[typeof(T).Name] as T,
                     LoadSceneControllerPayLoad<T>.LoadSceneControllerState.Repeated);
             }
@@ -166,20 +167,20 @@ namespace UG20260527
             // 创建 场景管理器
             T sceneController = new T();
             _sceneControllerDict.Add(typeof(T).Name, sceneController);
-            await sceneController.OnInit();
+            await sceneController.OnInit(sceneConfig.sceneConfigDict[typeof(T).Name]);
             await sceneController.OnPreEnter();
 
             var handle = this.GetSystem<IResourceSystem>().LoadScenceHandleAsync(
-                sceneConfig.sceneConfigDict[typeof(T).Name].sceneAssetPath, 
-                LoadSceneMode.Additive, 
-                activeOnLoad);
+            sceneConfig.sceneConfigDict[typeof(T).Name].sceneAssetPath,
+            LoadSceneMode.Additive,
+            activeOnLoad);
             handle.Completed += async h =>
             {
                 await sceneController.OnEnter(h.Result);
             };
 
             return new LoadSceneControllerPayLoad<T>(handle, sceneController);
-
+            
         }
 
         /// <summary>
@@ -222,13 +223,19 @@ namespace UG20260527
         /// </summary>
         public SceneInstance sceneInstance { get; private set; }
 
+        /// <summary>
+        /// 场景配置
+        /// </summary>
+        public SceneConfigData sceneConfig { get; private set; }
+
 
         /// <summary>
         /// 自身初始化
         /// </summary>
-        public virtual UniTask OnInit() 
+        public virtual UniTask OnInit(SceneConfigData sceneConfig)
         {
             // 异步初始化
+            this.sceneConfig = sceneConfig;
 
             return UniTask.CompletedTask;
         }

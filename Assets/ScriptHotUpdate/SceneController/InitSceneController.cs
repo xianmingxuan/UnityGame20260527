@@ -20,16 +20,6 @@ namespace UG20260527
             _sceneSystem.EnterScencePayLoadAsync<UISceneController>();
         }
 
-        /* -------------------------------------------------- 游戏流程 -------------------------------------------------- */
-
-        // 进入 InitScene
-
-        // 进入 UIScene
-
-        // 进入 游玩Scene
-
-        // 开始游戏
-
 
 
 

@@ -13,12 +13,19 @@ namespace UG20260527
     public interface IResourceSystem : ISystem
     {
         /// <summary>
+        /// 加载资源，直接返回句柄
+        /// </summary>
+        /// <typeparam name="TObject"></typeparam>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public AsyncOperationHandle<TObject> LoadAssetHandleAsync<TObject>(string path);
+        /// <summary>
         /// 加载资源预制体（加载到内存中）
         /// </summary>
         /// <typeparam name="TObject">GameObject预制体</typeparam>
         /// <param name="path">资源路径（Addressables的地址名）</param>
         /// <returns></returns>
-        public UniTask<TObject> LoadAssetsAsync<TObject>(string path);
+        public UniTask<TObject> LoadAssetAsync<TObject>(string path);
         /// <summary>
         /// 实例化资源
         /// </summary>
@@ -80,12 +87,24 @@ namespace UG20260527
         /* -------------------------------------------------- 预制体资源 -------------------------------------------------- */
 
         /// <summary>
+        /// 加载资源，直接返回句柄
+        /// </summary>
+        /// <typeparam name="TObject"></typeparam>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        AsyncOperationHandle<TObject> IResourceSystem.LoadAssetHandleAsync<TObject>(string path)
+        {
+            return Addressables.LoadAssetAsync<TObject>(path);
+        }
+
+
+        /// <summary>
         /// 加载资源预制体（加载到内存中）
         /// </summary>
         /// <typeparam name="TObject">GameObject预制体</typeparam>
         /// <param name="path">资源路径（Addressables的地址名）</param>
         /// <returns></returns>
-        async UniTask<TObject> IResourceSystem.LoadAssetsAsync<TObject>(string path)
+        async UniTask<TObject> IResourceSystem.LoadAssetAsync<TObject>(string path)
         {
             return await Addressables.LoadAssetAsync<TObject>(path).Task;
         }
