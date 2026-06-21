@@ -55,9 +55,32 @@ namespace UG20260527
 
     public interface ISceneSystem : ISystem
     {
+        /// <summary>
+        /// 加载并进入场景，根据场景管理器类型
+        /// </summary>
+        /// <typeparam name="T">SceneController类型</typeparam>
+        /// <param name="activeOnLoad">是否直接激活场景</param>
+        /// <returns></returns>
         public UniTask<T> EnterScenceAsync<T>(bool activeOnLoad = true) where T : SceneControllerBase, new();
+        /// <summary>
+        /// 加载并进入场景，返回 加载场景控制器载荷
+        /// </summary>
+        /// <typeparam name="T">SceneController类型</typeparam>
+        /// <param name="activeOnLoad">是否直接激活场景</param>
+        /// <returns>加载场景控制器 载荷</returns>
         public UniTask<LoadSceneControllerPayLoad<T>> EnterScencePayLoadAsync<T>(bool activeOnLoad = true) where T : SceneControllerBase, new();
+        /// <summary>
+        /// 退出场景
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         public UniTask<bool> ExitScenceAsync<T>() where T : SceneControllerBase;
+        /// <summary>
+        /// 激活 场景实例
+        /// </summary>
+        /// <param name="sceneInstance"></param>
+        /// <returns></returns>
+        public AsyncOperation ActivateAsync(SceneControllerBase sceneController, SceneInstance sceneInstance);
     }
 
     /// <summary>
@@ -70,6 +93,9 @@ namespace UG20260527
         private string sceneConfigPath = "Assets/AddressablesAsset/Config/SceneConfig.asset";
         private SceneConfig sceneConfig;
 
+        // 场景数据
+        private ISceneModel _sceneModel;
+
 
         /// <summary>
         /// 场景控制器 字典（场景控制器名 -> 场景控制器实例）
@@ -79,7 +105,7 @@ namespace UG20260527
 
         protected override void OnInit()
         {
-
+            _sceneModel = this.GetModel<ISceneModel>();
         }
 
 
@@ -125,14 +151,17 @@ namespace UG20260527
             T sceneController = new T();
             _sceneControllerDict.Add(typeof(T).Name, sceneController);
             await sceneController.OnInit(sceneConfig.sceneConfigDict[typeof(T).Name]);
-            await sceneController.OnPreEnter();
 
             // 加载并进入场景
             var sceneInstance = await this.GetSystem<IResourceSystem>().LoadScenceAsync(
                 sceneConfig.sceneConfigDict[typeof(T).Name].sceneAssetPath, 
                 LoadSceneMode.Additive, 
                 activeOnLoad);
-            await sceneController.OnEnter(sceneInstance);
+            await sceneController.OnPreEnter(sceneInstance);
+            await sceneController.OnEnter();
+
+            // 添加 活跃中场景
+            if (activeOnLoad) _sceneModel.AddActiveSceneControllerList(sceneController.GetType().Name);
 
 
             return sceneController;
@@ -168,7 +197,6 @@ namespace UG20260527
             T sceneController = new T();
             _sceneControllerDict.Add(typeof(T).Name, sceneController);
             await sceneController.OnInit(sceneConfig.sceneConfigDict[typeof(T).Name]);
-            await sceneController.OnPreEnter();
 
             var handle = this.GetSystem<IResourceSystem>().LoadScenceHandleAsync(
             sceneConfig.sceneConfigDict[typeof(T).Name].sceneAssetPath,
@@ -176,7 +204,11 @@ namespace UG20260527
             activeOnLoad);
             handle.Completed += async h =>
             {
-                await sceneController.OnEnter(h.Result);
+                await sceneController.OnPreEnter(h.Result);
+                await sceneController.OnEnter();
+
+                // 添加 活跃中场景
+                if (activeOnLoad) _sceneModel.AddActiveSceneControllerList(sceneController.GetType().Name);
             };
 
             return new LoadSceneControllerPayLoad<T>(handle, sceneController);
@@ -206,7 +238,23 @@ namespace UG20260527
             await this.GetSystem<IResourceSystem>().UnLoadScenceAsync(sceneController.sceneInstance);
             sceneController.OnExit();
 
+            // 移除 活跃中场景
+            _sceneModel.RemoveActiveSceneControllerList(typeof(T).Name);
+
             return true;
+        }
+
+        /// <summary>
+        /// 激活 场景实例
+        /// </summary>
+        /// <param name="sceneInstance"></param>
+        /// <returns></returns>
+        AsyncOperation ISceneSystem.ActivateAsync(SceneControllerBase sceneController, SceneInstance sceneInstance)
+        {
+            // 添加 活跃中场景
+            _sceneModel.AddActiveSceneControllerList(sceneController.GetType().Name);
+
+            return sceneInstance.ActivateAsync();
         }
 
     }
@@ -230,7 +278,7 @@ namespace UG20260527
 
 
         /// <summary>
-        /// 自身初始化
+        /// 自身初始化（预加载相关资源 到 内存中）
         /// </summary>
         public virtual UniTask OnInit(SceneConfigData sceneConfig)
         {
@@ -241,22 +289,22 @@ namespace UG20260527
         }
 
         /// <summary>
-        /// 准备 进入场景（预加载相关资源 到 内存中）
+        /// 准备 进入场景（场景已打开，异步加载场景内的东西，打开HUD，生成玩家，等）
         /// </summary>
-        public virtual UniTask OnPreEnter() 
+        public virtual UniTask OnPreEnter(SceneInstance sceneInstance)
         {
-            // 异步加载资源
+            // 异步加载并实例化场景中的对象
+            this.sceneInstance = sceneInstance;
 
             return UniTask.CompletedTask;
         }
 
         /// <summary>
-        /// 已经 进入场景（打开HUD，生成玩家，等）
+        /// 已经 进入场景
         /// </summary>
-        public virtual UniTask OnEnter(SceneInstance sceneInstance)
+        public virtual UniTask OnEnter()
         {
-            // 异步加载并实例化场景中的对象
-            this.sceneInstance = sceneInstance;
+            // 执行异步逻辑
 
             return UniTask.CompletedTask;
         }

@@ -1,7 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using QFramework;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.ResourceManagement.ResourceProviders;
 
@@ -34,34 +33,71 @@ namespace UG20260527
             await base.OnInit(sceneConfig);
             
             // 监听：开始加载 PlayScene
-            var unRegisterHandle1 = this.RegisterEvent<LoadPlaySceneEvent<PlaySceneController>>(e =>
+            var unRegisterHandle1 = this.RegisterEvent<LoadSceneEvent<PlaySceneController>>(async e =>
             {
                 // 隐藏MainPanel，显示LoadingPanel
                 Debug.Log($"UI场景控制器 - 显示加载UI - 正在加载的场景：{e.payload.sceneController.sceneConfig.sceneAssetPath}");
-                this.GetSystem<IUISystem>().CloseSinglePanel(_mainPanel.panelConfig.panelLayer, new ClosePanelSetting { panelShouldClose = _mainPanel });
+                await this.GetSystem<IUISystem>().OpenSinglePanel<LoadingPanel>(null, new LoadingPanelData(e.payload.handle));
+                await this.GetSystem<IUISystem>().CloseSinglePanel(_mainPanel.panelConfig.panelLayer, new ClosePanelSetting { panelShouldClose = _mainPanel });
             });
 
             // 监听：进入 PlayScene
-            var unRegisterHandle2 = this.RegisterEvent<EnterPlaySceneEvent<PlaySceneController>>(async e =>
+            var unRegisterHandle2 = this.RegisterEvent<EnterSceneEvent<PlaySceneController>>(async e =>
             {
                 // 隐藏LoadingPanel，显示HUD
                 Debug.Log($"UI场景控制器 - 显示HUD - 已加载的场景：{e.payload.sceneController.sceneConfig.sceneAssetPath}");
                 _hudPanel = await this.GetSystem<IUISystem>().OpenSinglePanel<HUDPanel>();
+                await UniTask.WaitForSeconds(1);
+                await this.GetSystem<IUISystem>().CloseSinglePanel(PanelLayer.LoadingLayer);
+            });
+
+            // 监听：退出 PlayScene
+            var unRegisterHandle3 = this.RegisterEvent<PreExitSceneEvent<PlaySceneController>>(async e =>
+            {
+                // 隐藏 HUD
+                await this.GetSystem<IUISystem>().CloseSinglePanel(_hudPanel.panelConfig.panelLayer, new ClosePanelSetting { panelShouldClose = _hudPanel });
+                // 进入UI场景
+                await EnterUIScene();
             });
 
             _unRegisterLifeList.Add(unRegisterHandle1);
             _unRegisterLifeList.Add(unRegisterHandle2);
+            _unRegisterLifeList.Add(unRegisterHandle3);
         }
 
         /// <summary>
-        /// 进入UI场景
+        /// 打开UI场景，打开UI
         /// </summary>
         /// <param name="sceneInstance"></param>
         /// <returns></returns>
-        public override async UniTask OnEnter(SceneInstance sceneInstance)
+        public override async UniTask OnPreEnter(SceneInstance sceneInstance)
         {
-            await base.OnEnter(sceneInstance);
+            await base.OnPreEnter(sceneInstance);
 
+            // 进入 UI场景
+            await EnterUIScene();
+        }
+
+        /// <summary>
+        /// 销毁UI场景
+        /// </summary>
+        public override void OnPreExit()
+        {
+            base.OnPreExit();
+
+            // 注销 临时监听
+            UnRegisterTempList();
+
+            // 注销 生命周期监听
+            UnRegisterLifeList();
+        }
+
+
+        /* -------------------------------------------------- API函数 -------------------------------------------------- */
+
+        // 进入 UI场景
+        private async UniTask EnterUIScene()
+        {
             // 注销 临时监听
             UnRegisterTempList();
 
@@ -95,34 +131,9 @@ namespace UG20260527
                 panelSC.InitToggleGroup(1);
             }, null, new OpenPanelSetting { isPushStack = false });
             _mainPanel.transform.SetParent(GameObject.Find("NormalLayer").transform);
-
-            return;
         }
 
-        /// <summary>
-        /// 销毁UI场景
-        /// </summary>
-        public override void OnPreExit()
-        {
-            base.OnPreExit();
-
-            // 注销 临时监听
-            UnRegisterTempList();
-
-            // 注销 生命周期监听
-            if (_unRegisterLifeList != null && _unRegisterLifeList.Count > 0)
-            {
-                foreach (var unRegister in _unRegisterLifeList)
-                {
-                    unRegister.UnRegister();
-                }
-            }
-        }
-
-
-        /* -------------------------------------------------- API函数 -------------------------------------------------- */
-
-        // 注销监听
+        // 注销 临时监听
         private void UnRegisterTempList()
         {
             // 注销监听
@@ -132,6 +143,21 @@ namespace UG20260527
                 {
                     unRegister.UnRegister();
                 }
+                _unRegisterTempList.Clear();
+            }
+        }
+
+        // 注销 生命周期监听
+        private void UnRegisterLifeList()
+        {
+            // 注销 生命周期监听
+            if (_unRegisterLifeList != null && _unRegisterLifeList.Count > 0)
+            {
+                foreach (var unRegister in _unRegisterLifeList)
+                {
+                    unRegister.UnRegister();
+                }
+                _unRegisterLifeList.Clear();
             }
         }
 

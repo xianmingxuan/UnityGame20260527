@@ -45,7 +45,11 @@ MonoBehaviour:
     panelLayer: 1
     panelPrefab: {fileID: 6486930718233581543, guid: ca30acf9307f9464ebc36276200a7386, type: 3}
     panelTypeName: TestItem
-  _panelConfigList:
+  - panelScript: {fileID: 11500000, guid: 73974e98b72eb914eaca562f85622908, type: 3}
+    panelLayer: 4
+    panelPrefab: {fileID: 6005095938779818467, guid: 072325ccbebf25146b1802825af39a76, type: 3}
+    panelTypeName: LoadingPanel
+  serializePanelConfigList:
   - panelLayer: 1
     panelAssetPath: Assets/AddressablesAsset/Prefabs/UI/MainPanel.prefab
     panelTypeName: MainPanel
@@ -70,3 +74,6 @@ MonoBehaviour:
   - panelLayer: 1
     panelAssetPath: Assets/AddressablesAsset/Prefabs/UI/LoopScrollView/TestItem.prefab
     panelTypeName: TestItem
+  - panelLayer: 4
+    panelAssetPath: Assets/AddressablesAsset/Prefabs/UI/LoadingPanel.prefab
+    panelTypeName: LoadingPanel

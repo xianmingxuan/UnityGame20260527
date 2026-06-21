@@ -111,7 +111,7 @@ namespace UG20260527
         {
             base.OnPause();
 
-            // 子面板 冻结（可以不写）
+            // 子面板 冻结
             //if (panel_BeginPlay) panel_BeginPlay.OnPause();
             //if (panel_Bag) panel_Bag.OnPause();
         }
@@ -120,19 +120,21 @@ namespace UG20260527
         {
             base.OnResume();
 
-            // 子面板 恢复（可以不写）
+            // 子面板 恢复
             //if(panel_BeginPlay) panel_BeginPlay.OnResume();
             //if (panel_Bag) panel_Bag.OnResume();
         }
 
         public override void OnClose()
         {
-            base.OnClose();
-
             // 子面板 销毁（回收）
             var sys = this.GetSystem<IUISystem>();
             if (panel_BeginPlay) sys.CloseSinglePanel(PanelLayer.NormalLayer, new ClosePanelSetting { panelShouldClose = panel_BeginPlay });
+            panel_BeginPlay = null;
             if (panel_Bag) sys.CloseSinglePanel(PanelLayer.NormalLayer, new ClosePanelSetting { panelShouldClose = panel_Bag });
+            panel_Bag = null;
+
+            base.OnClose();
         }
 
 

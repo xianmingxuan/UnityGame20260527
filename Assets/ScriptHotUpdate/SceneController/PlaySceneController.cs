@@ -8,11 +8,6 @@ namespace UG20260527
 {
     public class PlaySceneController : SceneControllerBase
     {
-        public override UniTask OnEnter(SceneInstance sceneInstance)
-        {
-            return base.OnEnter(sceneInstance);
 
-
-        }
     }
 }
