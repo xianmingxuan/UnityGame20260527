@@ -19,8 +19,7 @@ namespace UG20260527
         // Main界面
         private MainPanel _mainPanel;
 
-        // HUD界面
-        private HUDPanel _hudPanel;
+        
 
         /* -------------------------------------------------- 生命周期 -------------------------------------------------- */
 
@@ -33,29 +32,27 @@ namespace UG20260527
             await base.OnInit(sceneConfig);
             
             // 监听：开始加载 PlayScene
-            var unRegisterHandle1 = this.RegisterEvent<LoadSceneEvent<PlaySceneController>>(async e =>
+            var unRegisterHandle1 = this.RegisterEvent<LoadSceneEvent>(async e =>
             {
                 // 隐藏MainPanel，显示LoadingPanel
-                Debug.Log($"UI场景控制器 - 显示加载UI - 正在加载的场景：{e.payload.sceneController.sceneConfig.sceneAssetPath}");
+                //Debug.Log($"UI场景控制器 - 显示加载UI - 正在加载的场景：{e.payload.sceneControllerType.Name}");
                 await this.GetSystem<IUISystem>().OpenSinglePanel<LoadingPanel>(null, new LoadingPanelData(e.payload.handle));
                 await this.GetSystem<IUISystem>().CloseSinglePanel(_mainPanel.panelConfig.panelLayer, new ClosePanelSetting { panelShouldClose = _mainPanel });
             });
 
             // 监听：进入 PlayScene
-            var unRegisterHandle2 = this.RegisterEvent<EnterSceneEvent<PlaySceneController>>(async e =>
+            var unRegisterHandle2 = this.RegisterEvent<EnterSceneEvent>(async e =>
             {
                 // 隐藏LoadingPanel，显示HUD
-                Debug.Log($"UI场景控制器 - 显示HUD - 已加载的场景：{e.payload.sceneController.sceneConfig.sceneAssetPath}");
-                _hudPanel = await this.GetSystem<IUISystem>().OpenSinglePanel<HUDPanel>();
-                await UniTask.WaitForSeconds(1);
+                //Debug.Log($"UI场景控制器 - 显示HUD - 已加载的场景：{e.payload.sceneControllerType.Name}");
+                await UniTask.WaitForSeconds(0.5f);
                 await this.GetSystem<IUISystem>().CloseSinglePanel(PanelLayer.LoadingLayer);
             });
 
             // 监听：退出 PlayScene
-            var unRegisterHandle3 = this.RegisterEvent<PreExitSceneEvent<PlaySceneController>>(async e =>
+            var unRegisterHandle3 = this.RegisterEvent<PreExitSceneEvent>(async e =>
             {
-                // 隐藏 HUD
-                await this.GetSystem<IUISystem>().CloseSinglePanel(_hudPanel.panelConfig.panelLayer, new ClosePanelSetting { panelShouldClose = _hudPanel });
+                //Debug.Log($"退出的场景： {e.exitSceneControllerType.Name}");
                 // 进入UI场景
                 await EnterUIScene();
             });

@@ -1,31 +1,51 @@
 ﻿
+using System;
+
 namespace UG20260527
 {
-    // 开始加载 Scene
-    public struct LoadSceneEvent<T> where T : SceneControllerBase
+    // OnInit Scene
+    public struct LoadSceneEvent
     {
-        public LoadSceneControllerPayLoad<T> payload;
+        public LoadSceneControllerPayLoad payload;
 
-        public LoadSceneEvent(LoadSceneControllerPayLoad<T> payload) { this.payload = payload; }
+        public LoadSceneEvent(LoadSceneControllerPayLoad payload) { this.payload = payload; }
     }
 
-    // 加载完成，进入 Scene
-    public struct EnterSceneEvent<T> where T : SceneControllerBase
+    // PreEnter Scene
+    public struct PreEnterSceneEvent
     {
-        public LoadSceneControllerPayLoad<T> payload;
+        public LoadSceneControllerPayLoad payload;
 
-        public EnterSceneEvent(LoadSceneControllerPayLoad<T> payload) { this.payload = payload; }
+        public PreEnterSceneEvent(LoadSceneControllerPayLoad payload) { this.payload = payload; }
+    }
+    
+    // Enter Scene
+    public struct EnterSceneEvent
+    {
+        public LoadSceneControllerPayLoad payload;
+
+        public EnterSceneEvent(LoadSceneControllerPayLoad payload) { this.payload = payload; }
     }
 
-    // 准备 退出场景
-    public struct PreExitSceneEvent<T> where T : SceneControllerBase
+    // PreExit Scene
+    public struct PreExitSceneEvent
     {
+        public Type exitSceneControllerType;
 
+        public PreExitSceneEvent(Type exitSceneControllerType)
+        {
+            this.exitSceneControllerType = exitSceneControllerType;
+        }
     }
 
-    // 退出场景
-    public struct ExitSceneEvent<T> where T : SceneControllerBase
+    // Exit Scene
+    public struct ExitSceneEvent
     {
+        public Type exitSceneControllerType;
 
+        public ExitSceneEvent(Type exitSceneControllerType)
+        {
+            this.exitSceneControllerType = exitSceneControllerType;
+        }
     }
 }

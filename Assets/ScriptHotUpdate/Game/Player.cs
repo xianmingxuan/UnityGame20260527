@@ -42,7 +42,7 @@ namespace UG20260527
             this.GetSystem<ICameraSystem>().SetTarget(this.transform);
 
             // 输入系统
-            this.GetSystem<IInputSystem>().SwitchActionMap("PlayerMap");
+            //this.GetSystem<IInputSystem>().SwitchActionMap("PlayerMap");  // 在场景控制器中启用
             this.RegisterEvent<InputActionEvent>(e =>
             {
                 if (!string.IsNullOrEmpty(e.mapName) && e.mapName == "PlayerMap")

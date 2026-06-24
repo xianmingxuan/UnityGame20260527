@@ -38,12 +38,12 @@ MonoBehaviour:
     - default
     - scenes
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 866675282fe32994b92c01a4802c5637
-    m_Address: Assets/AddressablesAsset/Art/Textures
+  - m_GUID: 46dea197031c54b9ebd7743855a9bd12
+    m_Address: Assets/AddressablesAsset/Art/Models
     m_ReadOnly: 0
     m_SerializedLabels:
     - default
-    - texture
+    - model
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 8e076ec563e57c246ac8784e645fd7ca
     m_Address: Assets/AddressablesAsset/Assembly
@@ -51,6 +51,20 @@ MonoBehaviour:
     m_SerializedLabels:
     - assembly
     - default
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c37cbee091a3e4c6ebe239c9e829351c
+    m_Address: Assets/AddressablesAsset/Art/Materials
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - default
+    - materials
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c9690f9f079a84fb3ba41e93d59b816b
+    m_Address: Assets/AddressablesAsset/Art/Textures
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - default
+    - texture
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 1eeaa34c2f122524f9062fec01269caf, type: 2}

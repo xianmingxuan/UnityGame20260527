@@ -2,8 +2,8 @@
 using QFramework;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.ResourceManagement.ResourceProviders;
 using UnityEngine.SceneManagement;
@@ -14,7 +14,7 @@ namespace UG20260527
     /// 加载场景控制器 载荷
     /// </summary>
     /// <typeparam name="T">SceneControllerBase子类</typeparam>
-    public class LoadSceneControllerPayLoad<T> where T : SceneControllerBase
+    public class LoadSceneControllerPayLoad
     {
 
         public enum LoadSceneControllerState
@@ -43,13 +43,44 @@ namespace UG20260527
         /// <summary>
         /// 场景控制器
         /// </summary>
-        public T sceneController;
+        public SceneControllerBase sceneController;
 
-        public LoadSceneControllerPayLoad(AsyncOperationHandle<SceneInstance> handle, T sceneController, LoadSceneControllerState state = LoadSceneControllerState.Succeed)
+        /// <summary>
+        /// 场景控制器类型
+        /// </summary>
+        public Type sceneControllerType;
+
+        /// <summary>
+        /// 场景OnPreEnter执行完成回调
+        /// </summary>
+        public event UnityAction<SceneControllerBase> onPreEnterComplete;
+
+        /// <summary>
+        /// 场景OnEnter执行完成回调
+        /// </summary>
+        public event UnityAction<SceneControllerBase> onEnterComplete;
+
+        public LoadSceneControllerPayLoad(
+            AsyncOperationHandle<SceneInstance> handle, 
+            SceneControllerBase sceneController,
+            Type sceneControllerType, 
+            LoadSceneControllerState state = LoadSceneControllerState.Succeed)
         {
             this.handle = handle;
             this.sceneController = sceneController;
             this.state = state;
+            this.sceneControllerType = sceneControllerType;
+        }
+
+        // 触发事件
+        public void OnPreEnterComplete(SceneControllerBase sceneController)
+        {
+            onPreEnterComplete?.Invoke(sceneController);
+        }
+        
+        public void OnEnterComplete(SceneControllerBase sceneController)
+        {
+            onEnterComplete?.Invoke(sceneController);
         }
     }
 
@@ -68,7 +99,7 @@ namespace UG20260527
         /// <typeparam name="T">SceneController类型</typeparam>
         /// <param name="activeOnLoad">是否直接激活场景</param>
         /// <returns>加载场景控制器 载荷</returns>
-        public UniTask<LoadSceneControllerPayLoad<T>> EnterScencePayLoadAsync<T>(bool activeOnLoad = true) where T : SceneControllerBase, new();
+        public UniTask<LoadSceneControllerPayLoad> EnterScencePayLoadAsync<T>(bool activeOnLoad = true) where T : SceneControllerBase, new();
         /// <summary>
         /// 退出场景
         /// </summary>
@@ -173,7 +204,7 @@ namespace UG20260527
         /// <typeparam name="T">SceneController类型</typeparam>
         /// <param name="activeOnLoad">是否直接激活场景</param>
         /// <returns>加载场景控制器 载荷</returns>
-        async UniTask<LoadSceneControllerPayLoad<T>> ISceneSystem.EnterScencePayLoadAsync<T>(bool activeOnLoad)
+        async UniTask<LoadSceneControllerPayLoad> ISceneSystem.EnterScencePayLoadAsync<T>(bool activeOnLoad)
         {
             // Scene配置
             if (sceneConfig == null) await LoadSceneConfig();
@@ -187,10 +218,11 @@ namespace UG20260527
             if (_sceneControllerDict.ContainsKey(typeof(T).Name))
             {
                 Debug.LogWarning($"{typeof(T).Name} 场景资源和控制器 已被加载并创建，不能重复创建");
-                return new LoadSceneControllerPayLoad<T>(
+                return new LoadSceneControllerPayLoad(
                     new AsyncOperationHandle<SceneInstance>(),
                     _sceneControllerDict[typeof(T).Name] as T,
-                    LoadSceneControllerPayLoad<T>.LoadSceneControllerState.Repeated);
+                    typeof(T),
+                    LoadSceneControllerPayLoad.LoadSceneControllerState.Repeated);
             }
 
             // 创建 场景管理器
@@ -198,21 +230,31 @@ namespace UG20260527
             _sceneControllerDict.Add(typeof(T).Name, sceneController);
             await sceneController.OnInit(sceneConfig.sceneConfigDict[typeof(T).Name]);
 
+            // 异步加载场景
             var handle = this.GetSystem<IResourceSystem>().LoadScenceHandleAsync(
             sceneConfig.sceneConfigDict[typeof(T).Name].sceneAssetPath,
             LoadSceneMode.Additive,
             activeOnLoad);
+
+            // 加载载荷
+            LoadSceneControllerPayLoad payload = new LoadSceneControllerPayLoad(handle, sceneController, typeof(T));
+
+            // 加载完成回调
             handle.Completed += async h =>
             {
                 await sceneController.OnPreEnter(h.Result);
+                payload.OnPreEnterComplete(sceneController);
+
                 await sceneController.OnEnter();
+                payload.OnEnterComplete(sceneController);
 
                 // 添加 活跃中场景
                 if (activeOnLoad) _sceneModel.AddActiveSceneControllerList(sceneController.GetType().Name);
             };
 
-            return new LoadSceneControllerPayLoad<T>(handle, sceneController);
-            
+            return payload;
+
+
         }
 
         /// <summary>

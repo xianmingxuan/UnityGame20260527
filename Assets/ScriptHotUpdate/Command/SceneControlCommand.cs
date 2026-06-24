@@ -46,14 +46,26 @@ namespace UG20260527
             // 开始加载 PlayScene（UISceneController监听，打开 Loading界面）
             var payload = await this.GetSystem<ISceneSystem>().EnterScencePayLoadAsync<PlaySceneController>(false);
             // 通知：开始加载 PlayScene
-            this.SendEvent(new LoadSceneEvent<PlaySceneController>(payload));
+            Debug.Log($"OnInit 场景：{payload.sceneControllerType.Name}");
+            this.SendEvent(new LoadSceneEvent(payload));
 
-            // 等待加载中
+            // 绑定 通知：场景加载完成，执行PreEnter PlayScene
+            payload.onPreEnterComplete += v =>
+            {
+                Debug.Log($"PreEnter 场景：{payload.sceneControllerType.Name}");
+                this.SendEvent(new PreEnterSceneEvent(payload));
+            };
+
+            // 绑定 通知：PreEnter完成，执行Enter PlayScene
+            payload.onEnterComplete += v =>
+            {
+                Debug.Log($"Enter 场景：{payload.sceneControllerType.Name}");
+                this.SendEvent(new EnterSceneEvent(payload));
+            };
+
+            // 等待场景加载 并 激活 中
             await payload.handle.Task;
-
-            // 通知：加载完成，正式进入 PlayScene
             await this.GetSystem<ISceneSystem>().ActivateAsync(payload.sceneController, payload.sceneController.sceneInstance);
-            this.SendEvent(new EnterSceneEvent<PlaySceneController>(payload));
         }
     }
 
@@ -63,14 +75,20 @@ namespace UG20260527
         protected override async void OnExecute()
         {
             // 通知：准备退出 PlayScene
-            this.SendEvent(new PreExitSceneEvent<PlaySceneController>());
+            Debug.Log($"PreExit 场景：{typeof(PlaySceneController).Name}");
+            this.SendEvent(new PreExitSceneEvent(typeof(PlaySceneController)));
 
             // 等待退出中
             await this.GetSystem<ISceneSystem>().ExitScenceAsync<PlaySceneController>();
 
             // 通知：已退出 PlayScene
-            this.SendEvent(new ExitSceneEvent<PlaySceneController>());
+            Debug.Log($"Exit 场景：{typeof(PlaySceneController).Name}");
+            this.SendEvent(new ExitSceneEvent(typeof(PlaySceneController)));
 
         }
     }
+
+
+    /* ------------------------------------------------------------------------- TrafficScene 场景 ---------------------------------------------------------------------------- */
+
 }
