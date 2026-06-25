@@ -61,7 +61,7 @@ namespace UG20260527
             // 创建Item
             for (int i = 0; i < dataList.Count; i++)
             {
-                var item = await _system.OpenSinglePanel(itemType, null, dataList[i], new OpenPanelSetting { isPushStack = false});
+                var item = await _system.OpenSinglePanel(itemType, null, dataList[i], new OpenPanelSetting { isPushStack = false, isSetLayerParent = false });
                 item.transform.SetParent(_content);
                 _itemList.Add(item);
             }

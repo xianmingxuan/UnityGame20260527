@@ -19,8 +19,13 @@ MonoBehaviour:
   - sceneController: {fileID: 11500000, guid: 90302c65b73e70547a5aea0232e26004, type: 3}
     sceneAsset: {fileID: 102900000, guid: 9fc0d4010bbf28b4594072e72b8655ab, type: 3}
     sceneControllerTypeName: PlaySceneController
+  - sceneController: {fileID: 11500000, guid: a0e73a9b3a503374396883dcf1005bba, type: 3}
+    sceneAsset: {fileID: 102900000, guid: c12adc13db9088148a4b77016692de98, type: 3}
+    sceneControllerTypeName: TrafficSceneController
   sceneConfigDataList:
   - sceneControllerTypeName: UISceneController
     sceneAssetPath: Assets/AddressablesAsset/Scenes/UIScene.unity
   - sceneControllerTypeName: PlaySceneController
     sceneAssetPath: Assets/AddressablesAsset/Scenes/PlayScene.unity
+  - sceneControllerTypeName: TrafficSceneController
+    sceneAssetPath: Assets/AddressablesAsset/Scenes/TrafficScene.unity

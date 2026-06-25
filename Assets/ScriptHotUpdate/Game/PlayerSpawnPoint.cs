@@ -13,7 +13,7 @@ namespace UG20260527
 
         void Start()
         {
-            GameObject obj = this.GetSystem<IResourceSystem>().Instantiate(playerPrefab, transform.parent);
+            GameObject obj = this.GetSystem<IResourceSystem>().Instantiate(playerPrefab, gameObject.scene, transform.parent);
             obj.transform.localPosition = transform.localPosition;
             obj.transform.localRotation = transform.localRotation;
         }

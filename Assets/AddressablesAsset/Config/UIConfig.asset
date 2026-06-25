@@ -49,6 +49,10 @@ MonoBehaviour:
     panelLayer: 4
     panelPrefab: {fileID: 6005095938779818467, guid: 072325ccbebf25146b1802825af39a76, type: 3}
     panelTypeName: LoadingPanel
+  - panelScript: {fileID: 11500000, guid: 1256baaca3aa3f543a3eacc1fada1992, type: 3}
+    panelLayer: 1
+    panelPrefab: {fileID: 7676894250834082829, guid: 5b8670a0be9ea63439c7e4f82104a324, type: 3}
+    panelTypeName: TrafficSceneHUDPanel
   serializePanelConfigList:
   - panelLayer: 1
     panelAssetPath: Assets/AddressablesAsset/Prefabs/UI/MainPanel.prefab
@@ -77,3 +81,6 @@ MonoBehaviour:
   - panelLayer: 4
     panelAssetPath: Assets/AddressablesAsset/Prefabs/UI/LoadingPanel.prefab
     panelTypeName: LoadingPanel
+  - panelLayer: 1
+    panelAssetPath: Assets/AddressablesAsset/Prefabs/UI/TrafficSceneHUDPanel.prefab
+    panelTypeName: TrafficSceneHUDPanel

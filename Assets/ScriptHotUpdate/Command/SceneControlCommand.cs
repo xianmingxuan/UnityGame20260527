@@ -11,7 +11,7 @@ namespace UG20260527
     {
         protected override void OnExecute()
         {
-            string latestScene = this.GetModel<ISceneModel>().GetLatestSceneController();
+            string latestScene = this.GetModel<ISceneModel>().GetLatestSceneController().GetType().Name;
             if(string.IsNullOrEmpty(latestScene))
             {
                 Debug.Log("没有正在活跃中的场景");
@@ -19,17 +19,21 @@ namespace UG20260527
             }
 
             // PlayScene场景
-            if (latestScene == typeof(PlaySceneController).Name)
-            {
-                this.SendCommand<ExitPlaySceneCommand>();
-            }
-            else if(latestScene == typeof(InitSceneController).Name)
+            if(latestScene == typeof(InitSceneController).Name)
             {
                 Debug.Log($"最新场景为 {latestScene}，无法退出");
             }
             else if(latestScene == typeof(UISceneController).Name)
             {
                 Debug.Log($"最新场景为 {latestScene}，无法退出");
+            }
+            else if(latestScene == typeof(PlaySceneController).Name)
+            {
+                this.SendCommand<ExitPlaySceneCommand>();
+            }
+            else if(latestScene == typeof(TrafficSceneController).Name)
+            {
+                this.SendCommand<ExitTrafficSceneCommand>();
             }
         }
     }
@@ -90,5 +94,49 @@ namespace UG20260527
 
 
     /* ------------------------------------------------------------------------- TrafficScene 场景 ---------------------------------------------------------------------------- */
+
+    // 进入 TrafficScene 场景
+    public class EnterTrafficSceneCommand : AbstractCommand
+    {
+        protected override async void OnExecute()
+        {
+            var payload = await this.GetSystem<ISceneSystem>().EnterScencePayLoadAsync<TrafficSceneController>();
+
+            Debug.Log($"OnInit 场景：{payload.sceneControllerType.Name}");
+            this.SendEvent(new LoadSceneEvent(payload));
+
+            payload.onPreEnterComplete += v =>
+            {
+                Debug.Log($"PreEnter 场景：{payload.sceneControllerType.Name}");
+                this.SendEvent(new PreEnterSceneEvent(payload));
+            };
+
+            payload.onEnterComplete += v =>
+            {
+                Debug.Log($"Enter 场景：{payload.sceneControllerType.Name}");
+                this.SendEvent(new EnterSceneEvent(payload));
+            };
+
+            await payload.handle.Task;
+        }
+    }
+
+    // 退出 TrafficScene 场景
+    public class ExitTrafficSceneCommand : AbstractCommand
+    {
+        protected override async void OnExecute()
+        {
+            // 通知：准备退出 PlayScene
+            Debug.Log($"PreExit 场景：{typeof(TrafficSceneController).Name}");
+            this.SendEvent(new PreExitSceneEvent(typeof(TrafficSceneController)));
+
+            // 等待退出中
+            await this.GetSystem<ISceneSystem>().ExitScenceAsync<TrafficSceneController>();
+
+            // 通知：已退出 PlayScene
+            Debug.Log($"Exit 场景：{typeof(TrafficSceneController).Name}");
+            this.SendEvent(new ExitSceneEvent(typeof(TrafficSceneController)));
+        }
+    }
 
 }

@@ -123,11 +123,26 @@ namespace UG20260527
             _curDataIndex = 0;
         }
 
+        // 出口（回收）：回收所有的Item实例
+        public void Recycle()
+        {
+            // 回收Item，清空Item缓存列表
+            var sys = this.GetSystem<IUISystem>();
+            foreach (var item in _itemCacheList)
+            {
+                sys.CloseSinglePanel(item.panelConfig.panelLayer, new ClosePanelSetting { panelShouldClose = item});
+            }
+            _itemCacheList.Clear();
+
+            // 重置 当前数据索引
+            _curDataIndex = 0;
+        }
 
         // 入口：item预制体，item数据列表
         public async UniTask InitLoopScrollView<T, U>(T itemSC, List<U> dataList) where T : LoopScrollItemBase
         {
-            if(itemSC == null)
+            var sys = this.GetSystem<IUISystem>();
+            if (itemSC == null)
             {
                 return;
             }
@@ -175,6 +190,9 @@ namespace UG20260527
             await InitItem<T>();
 
             scrollRect.onValueChanged.AddListener(OnValueChanged);
+
+            // 先更新一次
+            OnValueChanged(content.position);
         }
 
         // 初始化Item

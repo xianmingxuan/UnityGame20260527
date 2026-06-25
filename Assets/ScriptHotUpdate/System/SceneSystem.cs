@@ -192,7 +192,7 @@ namespace UG20260527
             await sceneController.OnEnter();
 
             // 添加 活跃中场景
-            if (activeOnLoad) _sceneModel.AddActiveSceneControllerList(sceneController.GetType().Name);
+            if (activeOnLoad) _sceneModel.AddActiveSceneControllerList(sceneController);
 
 
             return sceneController;
@@ -249,7 +249,7 @@ namespace UG20260527
                 payload.OnEnterComplete(sceneController);
 
                 // 添加 活跃中场景
-                if (activeOnLoad) _sceneModel.AddActiveSceneControllerList(sceneController.GetType().Name);
+                if (activeOnLoad) _sceneModel.AddActiveSceneControllerList(sceneController);
             };
 
             return payload;
@@ -281,7 +281,7 @@ namespace UG20260527
             sceneController.OnExit();
 
             // 移除 活跃中场景
-            _sceneModel.RemoveActiveSceneControllerList(typeof(T).Name);
+            _sceneModel.RemoveActiveSceneControllerList(sceneController);
 
             return true;
         }
@@ -294,7 +294,7 @@ namespace UG20260527
         AsyncOperation ISceneSystem.ActivateAsync(SceneControllerBase sceneController, SceneInstance sceneInstance)
         {
             // 添加 活跃中场景
-            _sceneModel.AddActiveSceneControllerList(sceneController.GetType().Name);
+            _sceneModel.AddActiveSceneControllerList(sceneController);
 
             return sceneInstance.ActivateAsync();
         }

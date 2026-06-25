@@ -1,7 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using QFramework;
 using System;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -34,7 +33,7 @@ namespace UG20260527
         /// <param name="worldPositionStays">世界位置保持不变</param>
         /// <param name="actionOnGet">拿到对象时的逻辑注入</param>
         /// <returns></returns>
-        public GameObject Instantiate(GameObject prefab, Transform parent = null, bool worldPositionStays = true, Action<GameObject> actionOnGet = null);
+        public GameObject Instantiate(GameObject prefab, Scene scene, Transform parent = null, bool worldPositionStays = true, Action<GameObject> actionOnGet = null);
         /// <summary>
         /// 加载并实例化资源
         /// </summary>
@@ -44,7 +43,7 @@ namespace UG20260527
         /// <param name="worldPositionStays">世界位置保持不变</param>
         /// <param name="actionOnGet">拿到对象时的逻辑注入</param>
         /// <returns></returns>
-        public UniTask<GameObject> LoadAndInstantiateAsync<TObject>(string path, Transform parent = null, bool worldPositionStays = true, Action<GameObject> actionOnGet = null);
+        public UniTask<GameObject> LoadAndInstantiateAsync<TObject>(string path, Scene scene, Transform parent = null, bool worldPositionStays = true, Action<GameObject> actionOnGet = null);
         /// <summary>
         /// 回收资源
         /// </summary>
@@ -61,6 +60,8 @@ namespace UG20260527
         /// <returns>不受对象池管理，直接销毁，返回false</returns>
         public UniTask<bool> Recycle(GameObject obj, float delaySecond, Action<GameObject> actionOnRecycle = null);
 
+
+        // 场景相关
         public AsyncOperationHandle<SceneInstance> LoadScenceHandleAsync(string path, LoadSceneMode loadSceneMode, bool activeOnLoad);
         public UniTask<SceneInstance> LoadScenceAsync(string path, LoadSceneMode loadSceneMode = LoadSceneMode.Single, bool activeOnLoad = true);
         public void LoadScenceAsync(string path, LoadSceneMode loadSceneMode = LoadSceneMode.Single, bool activeOnLoad = true, Action<SceneInstance> callBack = null);
@@ -117,9 +118,10 @@ namespace UG20260527
         /// <param name="worldPositionStays">世界位置保持不变</param>
         /// <param name="actionOnGet">拿到对象时的逻辑注入</param>
         /// <returns></returns>
-        GameObject IResourceSystem.Instantiate(GameObject prefab, Transform parent, bool worldPositionStays, Action<GameObject> actionOnGet)
+        GameObject IResourceSystem.Instantiate(GameObject prefab, Scene scene, Transform parent, bool worldPositionStays, Action<GameObject> actionOnGet)
         {
-            GameObject obj = poolSystem.Get(prefab, actionOnGet);
+            if (parent) scene = parent.gameObject.scene;
+            GameObject obj = poolSystem.Get(prefab, scene, actionOnGet);
             obj.transform.SetParent(parent, worldPositionStays);
             return obj;
         }
@@ -133,10 +135,11 @@ namespace UG20260527
         /// <param name="worldPositionStays">世界位置保持不变</param>
         /// <param name="actionOnGet">拿到对象时的逻辑注入</param>
         /// <returns></returns>
-        async UniTask<GameObject> IResourceSystem.LoadAndInstantiateAsync<TObject>(string path, Transform parent, bool worldPositionStays, Action<GameObject> actionOnGet)
+        async UniTask<GameObject> IResourceSystem.LoadAndInstantiateAsync<TObject>(string path, Scene scene, Transform parent, bool worldPositionStays, Action<GameObject> actionOnGet)
         {
+            if (parent) scene = parent.gameObject.scene;
             var prefab = await Addressables.LoadAssetAsync<TObject>(path).Task as GameObject;
-            GameObject obj = poolSystem.Get(prefab, actionOnGet);
+            GameObject obj = poolSystem.Get(prefab, scene, actionOnGet);
             obj.transform.SetParent(parent, worldPositionStays);
             return obj;
         }

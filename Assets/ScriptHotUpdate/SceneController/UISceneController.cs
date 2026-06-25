@@ -35,7 +35,7 @@ namespace UG20260527
             var unRegisterHandle1 = this.RegisterEvent<LoadSceneEvent>(async e =>
             {
                 // 隐藏MainPanel，显示LoadingPanel
-                //Debug.Log($"UI场景控制器 - 显示加载UI - 正在加载的场景：{e.payload.sceneControllerType.Name}");
+                //Debug.Log($"UI场景控制器 - OnInit 场景：{e.payload.sceneControllerType.Name}");
                 await this.GetSystem<IUISystem>().OpenSinglePanel<LoadingPanel>(null, new LoadingPanelData(e.payload.handle));
                 await this.GetSystem<IUISystem>().CloseSinglePanel(_mainPanel.panelConfig.panelLayer, new ClosePanelSetting { panelShouldClose = _mainPanel });
             });
@@ -44,7 +44,7 @@ namespace UG20260527
             var unRegisterHandle2 = this.RegisterEvent<EnterSceneEvent>(async e =>
             {
                 // 隐藏LoadingPanel，显示HUD
-                //Debug.Log($"UI场景控制器 - 显示HUD - 已加载的场景：{e.payload.sceneControllerType.Name}");
+                //Debug.Log($"UI场景控制器 - PreEnter 场景：{e.payload.sceneControllerType.Name}");
                 await UniTask.WaitForSeconds(0.5f);
                 await this.GetSystem<IUISystem>().CloseSinglePanel(PanelLayer.LoadingLayer);
             });
@@ -127,7 +127,7 @@ namespace UG20260527
                 //panelSC.InitPageActive("Toggle_BeginPlay", false);
                 panelSC.InitToggleGroup(1);
             }, null, new OpenPanelSetting { isPushStack = false });
-            _mainPanel.transform.SetParent(GameObject.Find("NormalLayer").transform);
+
         }
 
         // 注销 临时监听

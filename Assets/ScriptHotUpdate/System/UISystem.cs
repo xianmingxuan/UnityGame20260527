@@ -45,47 +45,31 @@ namespace UG20260527
     /// <summary>
     /// 打开面板时的特殊设置
     /// </summary>
-    public struct OpenPanelSetting
+    public class OpenPanelSetting
     {
         /// <summary>
         /// 是否入栈（让UI栈控制面板冻结，子面板一般不入栈）
         /// </summary>
-        public bool isPushStack;
-        // 旧面板是否冻结
-        // 旧面板冻结时，透明度设置成多少
-
-        public OpenPanelSetting(bool isPushStack)
-        {
-            this.isPushStack = isPushStack;
-        }
+        public bool isPushStack = true;
 
         /// <summary>
-        /// 构建 默认值（正常情况下都使用这个默认值来OpenPanel）
+        /// 是否将父对象设置为原层级GameObject
         /// </summary>
-        /// <returns></returns>
-        public static OpenPanelSetting DefaultValue() => new OpenPanelSetting(true);
+        public bool isSetLayerParent = true;
+
+        // 旧面板是否冻结
+        // 旧面板冻结时，透明度设置成多少
     }
 
     /// <summary>
     /// 关闭面板时的特殊设置
     /// </summary>
-    public struct ClosePanelSetting
+    public class ClosePanelSetting
     {
         /// <summary>
         /// 需要关闭的Panel，一般是不受UI栈控制的Panel，如子面板
         /// </summary>
         public PanelBase panelShouldClose;
-
-        public ClosePanelSetting(PanelBase panel)
-        {
-            this.panelShouldClose = panel;
-        }
-
-        /// <summary>
-        /// 构建 默认值（正常情况下都使用这个默认值来关闭Panel）
-        /// </summary>
-        /// <returns></returns>
-        public static ClosePanelSetting DefaultValue() => new ClosePanelSetting(null);
     }
 
 
@@ -93,9 +77,9 @@ namespace UG20260527
 
     public interface IUISystem : ISystem
     {
-        public UniTask<T> OpenSinglePanel<T>(Action<T> onInit = null, object userData = null, OpenPanelSetting? openPanelSetting = null) where T : PanelBase;
-        public UniTask<PanelBase> OpenSinglePanel(Type type, Action<PanelBase> onInit = null, object userData = null, OpenPanelSetting? openPanelSetting = null);
-        public UniTask CloseSinglePanel(PanelLayer layer = PanelLayer.NormalLayer, ClosePanelSetting? closePanelSetting = null);
+        public UniTask<T> OpenSinglePanel<T>(Action<T> onInit = null, object userData = null, OpenPanelSetting openPanelSetting = null) where T : PanelBase;
+        public UniTask<PanelBase> OpenSinglePanel(Type type, Action<PanelBase> onInit = null, object userData = null, OpenPanelSetting openPanelSetting = null);
+        public UniTask CloseSinglePanel(PanelLayer layer = PanelLayer.NormalLayer, ClosePanelSetting closePanelSetting = null);
         public BindableProperty<Transform> parentCanvas { get; }
     }
 
@@ -158,11 +142,11 @@ namespace UG20260527
         }
 
         // 入栈 目标脚本
-        void PushPanelStack(PanelBase panelScript)
+        void PushPanelStack(PanelBase panelScript, bool isSetLayerParent = true)
         {
             // 获取目标层级UI栈
             List<PanelBase> panelStack = GetOrAddPanelStack(panelScript.panelConfig.panelLayer);
-            panelScript.transform.SetParent(_layerGameObjects[panelScript.panelConfig.panelLayer]);
+            if(isSetLayerParent) panelScript.transform.SetParent(_layerGameObjects[panelScript.panelConfig.panelLayer]);
             panelScript.transform.localPosition = Vector3.zero;
             panelScript.transform.localScale = Vector3.one;
 
@@ -303,7 +287,7 @@ namespace UG20260527
 
             // 实例化Panel
             //var panel = await Addressables.InstantiateAsync(panelPrefabPath, parentCanvas.Value, false).Task;
-            var panel = await this.GetSystem<IResourceSystem>().LoadAndInstantiateAsync<GameObject>(panelPrefabPath, parentCanvas.Value, false);
+            var panel = await this.GetSystem<IResourceSystem>().LoadAndInstantiateAsync<GameObject>(panelPrefabPath, parentCanvas.Value.gameObject.scene, parentCanvas.Value, false);
             panel.transform.localPosition = Vector3.zero;
             panel.transform.localScale = Vector3.one;
 
@@ -326,7 +310,7 @@ namespace UG20260527
 
             // 实例化Panel
             //var panel = await Addressables.InstantiateAsync(panelPrefabPath, parentCanvas.Value, false).Task;
-            var panel = await this.GetSystem<IResourceSystem>().LoadAndInstantiateAsync<GameObject>(panelPrefabPath, parentCanvas.Value, false);
+            var panel = await this.GetSystem<IResourceSystem>().LoadAndInstantiateAsync<GameObject>(panelPrefabPath, parentCanvas.Value.gameObject.scene, parentCanvas.Value, false);
             panel.transform.localPosition = Vector3.zero;
             panel.transform.localScale = Vector3.one;
 
@@ -344,21 +328,33 @@ namespace UG20260527
 
         /* -------------------------------------------------- 接口函数 -------------------------------------------------- */
 
-        async UniTask<T> IUISystem.OpenSinglePanel<T>(Action<T> onInit, object userData, OpenPanelSetting? openPanelSetting)
+        // 特殊 OpenPanel设置（由接口函数调用）
+        private void OpenPanelSetting(PanelBase panelScript,  OpenPanelSetting openPanelSetting)
+        {
+            // OpenPanel时的特殊配置
+            if (openPanelSetting == null) openPanelSetting = new OpenPanelSetting();
+
+            // 入栈
+            if (openPanelSetting.isPushStack)
+            {
+                PushPanelStack(panelScript, openPanelSetting.isSetLayerParent);
+            }
+            else
+            {
+                // 不入栈（由创建者自己管理生命周期，例如：子面板）
+                panelScript.OnOpen();
+                // 设置层级父对象
+                if (openPanelSetting.isSetLayerParent)
+                {
+                    panelScript.transform.SetParent(_layerGameObjects[panelScript.panelConfig.panelLayer]);
+                }
+            }
+        }
+
+        async UniTask<T> IUISystem.OpenSinglePanel<T>(Action<T> onInit, object userData, OpenPanelSetting openPanelSetting)
         {
             // 初始化 画布面板和层级GameObject
             InitCanvas();
-
-            // OpenPanel时的特殊配置
-            OpenPanelSetting setting = openPanelSetting ?? OpenPanelSetting.DefaultValue();
-
-            // 不入栈（由创建者自己管理，例如：子面板）
-            if (!setting.isPushStack)
-            {
-                T panelSC = await CreatePanel<T>(onInit, userData);
-                panelSC.OnOpen();
-                return panelSC;
-            }
 
             // 加载中Panel++
             pushingPanelCount.Value++;
@@ -372,29 +368,18 @@ namespace UG20260527
                 return null;
             }
 
-            // 入栈
-            PushPanelStack(panelScript);
+            // 特殊配置（包含：是否入栈，是否设置层级父对象 等）
+            OpenPanelSetting(panelScript, openPanelSetting);
 
             // 加载中Panel--
             pushingPanelCount.Value--;
             return panelScript;
         }
 
-        async UniTask<PanelBase> IUISystem.OpenSinglePanel(Type type, Action<PanelBase> onInit, object userData, OpenPanelSetting? openPanelSetting)
+        async UniTask<PanelBase> IUISystem.OpenSinglePanel(Type type, Action<PanelBase> onInit, object userData, OpenPanelSetting openPanelSetting)
         {
             // 初始化 画布面板和层级GameObject
             InitCanvas();
-
-            // OpenPanel时的特殊配置
-            OpenPanelSetting setting = openPanelSetting ?? OpenPanelSetting.DefaultValue();
-
-            // 不入栈（由创建者自己管理，例如：子面板）
-            if (!setting.isPushStack)
-            {
-                PanelBase panelSC = await CreatePanel(type, onInit, userData);
-                panelSC.OnOpen();
-                return panelSC;
-            }
 
             // 加载中Panel++
             pushingPanelCount.Value++;
@@ -408,8 +393,8 @@ namespace UG20260527
                 return null;
             }
 
-            // 入栈
-            PushPanelStack(panelScript);
+            // 特殊配置（包含：是否入栈，是否设置层级父对象 等）
+            OpenPanelSetting(panelScript, openPanelSetting);
 
             // 加载中Panel--
             pushingPanelCount.Value--;
@@ -418,20 +403,20 @@ namespace UG20260527
 
 
 
-        async UniTask IUISystem.CloseSinglePanel(PanelLayer layer, ClosePanelSetting? closePanelSetting)
+        async UniTask IUISystem.CloseSinglePanel(PanelLayer layer, ClosePanelSetting closePanelSetting)
         {
             // 先等其它 push任务 完成
             if (pushingPanelCount.Value > 0) await UniTask.WaitUntil(() => pushingPanelCount.Value <= 0);
 
             // 弹出指定Panel
-            ClosePanelSetting setting = closePanelSetting ?? ClosePanelSetting.DefaultValue();
-            if(setting.panelShouldClose != null)
+            if(closePanelSetting == null) closePanelSetting = new ClosePanelSetting();
+            if(closePanelSetting.panelShouldClose != null)
             {
                 // 弹栈 目标Panel
-                PopPanelStackOnly(setting.panelShouldClose);
+                PopPanelStackOnly(closePanelSetting.panelShouldClose);
 
                 // 关闭 目标Panel
-                setting.panelShouldClose.OnClose();
+                closePanelSetting.panelShouldClose.OnClose();
                 return;
             }
 
@@ -532,7 +517,6 @@ namespace UG20260527
         /// </summary>
         public virtual void OnClose()
         {
-            //GameObject.Destroy(gameObject);
             // 回收
             this.GetSystem<IResourceSystem>().Recycle(gameObject);
         }

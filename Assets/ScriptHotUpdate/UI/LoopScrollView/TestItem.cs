@@ -30,6 +30,12 @@ namespace UG20260527
             _text = GetComponentInChildren<Text>("Text");
             _img = GetComponentInChildren<Image>("Image");
             _color = _img.color;
+            return base.OnInit(onInit, userData);
+        }
+
+        public override void OnOpen()
+        {
+            base.OnOpen();
 
             GetComponentInChildren<Button>("Button").onClick.AddListener(() =>
             {
@@ -41,15 +47,22 @@ namespace UG20260527
                     // 面板位置
                     panel.viewport.localPosition = Mouse.current.position.ReadValue() / _system.parentCanvas.Value.GetComponent<Canvas>().scaleFactor;
                     panel.itemType = typeof(DynamicInfoItem);
-                    panel.dataList = new List<object> 
-                    { 
+                    panel.dataList = new List<object>
+                    {
                         new DynamicInfoItemData(_dataIndex.ToString()),
-                        new DynamicInfoItemData(_itemData.select.ToString()) 
+                        new DynamicInfoItemData(_itemData.select.ToString())
                     };
                 });
             });
+        }
 
-            return base.OnInit(onInit, userData);
+        public override void OnClose()
+        {
+            base.OnClose();
+
+            _img.color = _color;
+            gameObject.transform.localPosition = Vector3.zero;
+            GetComponentInChildren<Button>("Button").onClick.RemoveAllListeners();
         }
 
         public override void UpdataItem(object data, int dataIndex)

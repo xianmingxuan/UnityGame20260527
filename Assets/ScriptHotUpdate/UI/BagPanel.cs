@@ -8,9 +8,14 @@ namespace UG20260527
 {
     public class BagPanel : PanelBase
     {
-        public override async UniTask OnInit<T>(Action<T> onInit = null, object userData = null)
+        // 滚动窗口
+        private LoopScrollView scroll;
+
+        public override async void OnOpen()
         {
-            var scroll = GetComponentInChildren<LoopScrollView>("Scroll View");
+            base.OnOpen();
+
+            scroll = GetComponentInChildren<LoopScrollView>("Scroll View");
             var item = GetComponentInChildren<TestItem>("TestItem");
             if (item == null)
             {
@@ -23,13 +28,23 @@ namespace UG20260527
             for (int i = 0; i < 100; i++)
             {
                 TestItemData d = new TestItemData();
-                if(i == 20) d.select = true;
+                if (i == 20) d.select = true;
                 list.Add(d);
             }
 
+            // 创建 无限滚动窗口
             await scroll.InitLoopScrollView<TestItem, TestItemData>(item, list);
 
-            await base.OnInit(onInit, userData);
+            // 回收 占位符Item
+            await this.GetSystem<IUISystem>().CloseSinglePanel(item.panelConfig.panelLayer, new ClosePanelSetting { panelShouldClose = item });
+        }
+
+        public override void OnClose()
+        {
+            base.OnClose();
+
+            // 回收 无限滚动窗口
+            scroll.Recycle();
         }
     }
 }

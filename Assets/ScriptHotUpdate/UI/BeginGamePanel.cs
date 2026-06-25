@@ -49,6 +49,11 @@ namespace UG20260527
                 // 发送命令：进入 PlayScene
                 this.SendCommand<EnterPlaySceneCommand>();
             });
+
+            GetComponentInChildren<Button>("Btn_Qualifying")?.onClick.AddListener(() =>
+            {
+                this.SendCommand<EnterTrafficSceneCommand>();
+            });
         }
 
         public override void OnClose()
@@ -56,6 +61,7 @@ namespace UG20260527
             base.OnClose();
 
             GetComponentInChildren<Button>("Btn_Fight")?.onClick.RemoveAllListeners();
+            GetComponentInChildren<Button>("Btn_Qualifying")?.onClick.RemoveAllListeners();
         }
     }
 }

@@ -17,7 +17,7 @@ namespace UG20260527
             await base.OnPreEnter(sceneInstance);
             
             // 显示 HUD
-            _hudPanel = await this.GetSystem<IUISystem>().OpenSinglePanel<HUDPanel>();
+            _hudPanel = await this.GetSystem<IUISystem>().OpenSinglePanel<HUDPanel>(null, null, new OpenPanelSetting { isPushStack = false });
 
             await UniTask.WaitForSeconds(3);
 
