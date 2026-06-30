@@ -71,7 +71,7 @@ namespace UG20260527
 #if UNITY_EDITOR
         private void OnValidate()
         {
-            Debug.Log("刷新SceneConfig");
+            Debug.Log($"{AssetDatabase.GetAssetPath(this)} - 刷新成功！");
             if (sceneConfigDataList != null && sceneConfigDataList.Count > 0) sceneConfigDataList.Clear();
             foreach(var item in items)
             {

@@ -1,6 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using QFramework;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -60,6 +61,17 @@ namespace UG20260527
         /// <returns>不受对象池管理，直接销毁，返回false</returns>
         public UniTask<bool> Recycle(GameObject obj, float delaySecond, Action<GameObject> actionOnRecycle = null);
 
+
+        // 预制体路径
+        /// <summary>
+        /// 获取 制定文件夹目录 中 所有预制体的路径
+        /// </summary>
+        /// <param name="FileDirectory">文件夹目录，以"/"结尾</param>
+        /// <returns></returns>
+        public List<string> GetPrefabPathInFile(string FileDirectory)
+        {
+            return new List<string>();
+        }
 
         // 场景相关
         public AsyncOperationHandle<SceneInstance> LoadScenceHandleAsync(string path, LoadSceneMode loadSceneMode, bool activeOnLoad);

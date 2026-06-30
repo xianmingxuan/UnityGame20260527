@@ -1,7 +1,8 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using Codice.CM.Common;
 using QFramework;
+using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace UG20260527
 {
@@ -42,43 +43,6 @@ namespace UG20260527
         {
             CalculateAllPaths();
         }
-#if UNITY_EDITOR
-        //private void OnDrawGizmosSelected()
-        //{
-            
-        //}
-        private void OnDrawGizmos()
-        {
-            if (pathsPresetInfos.Count <= 0) return;
-            foreach (var pathInfo in pathsPresetInfos)
-            {
-                // 计算
-                if (pathInfo.movementType == PathsPresetInfo.MovementType.Straight)
-                {
-                    Gizmos.color = Color.blue;
-                    Gizmos.DrawLine(pathInfo.startPoint.position, pathInfo.endPoint.position);
-                }
-                else
-                {
-                    // 弯道路径
-                    float r = pathInfo.isCustomDis ? pathInfo.dis : dis;
-                    List<Vector3>  pathCache = CalculateTurnPath(
-                        pathInfo.startPoint.position,
-                        pathInfo.endPoint.position,
-                        pathInfo.midPoint.position,
-                        r,
-                        precision);
-
-                    Gizmos.color = Color.yellow;
-                    for(int i = 0; i < pathCache.Count - 1; i++)
-                    {
-                        if (i + 1 >= pathCache.Count) continue;
-                        Gizmos.DrawLine(pathCache[i], pathCache[i + 1]);
-                    }
-                }
-            }
-        }
-#endif
 
 
         // 计算所有预设路径
@@ -109,7 +73,7 @@ namespace UG20260527
                 }
 
                 // 加入字典缓存
-                _pathsCache.Add($"{pathInfo.directionType}-{pathInfo.movementType}", pathCache);
+                _pathsCache.Add(GetKey(pathInfo.directionType, pathInfo.movementType), pathCache);
             }
         }
 
@@ -194,8 +158,55 @@ namespace UG20260527
             return pathCache;
         }
 
+        private string GetKey(PathsPresetInfo.DirectionType directionType, PathsPresetInfo.MovementType movementType)
+        {
+            return $"{directionType}-{movementType}";
+        }
+
+        public List<Vector3> GetPath(PathsPresetInfo.DirectionType directionType, PathsPresetInfo.MovementType movementType)
+        {
+            return _pathsCache[GetKey(directionType, movementType)];
+        }
 
 
+
+#if UNITY_EDITOR
+        //private void OnDrawGizmosSelected()
+        //{
+
+        //}
+        private void OnDrawGizmos()
+        {
+            if (pathsPresetInfos.Count <= 0) return;
+            foreach (var pathInfo in pathsPresetInfos)
+            {
+                // 计算
+                if (pathInfo.movementType == PathsPresetInfo.MovementType.Straight)
+                {
+                    Gizmos.color = Color.blue;
+                    Gizmos.DrawLine(pathInfo.startPoint.position, pathInfo.endPoint.position);
+                }
+                else
+                {
+                    // 弯道路径
+                    float r = pathInfo.isCustomDis ? pathInfo.dis : dis;
+                    List<Vector3> pathCache = CalculateTurnPath(
+                        pathInfo.startPoint.position,
+                        pathInfo.endPoint.position,
+                        pathInfo.midPoint.position,
+                        r,
+                        precision);
+
+                    Gizmos.color = Color.yellow;
+                    for (int i = 0; i < pathCache.Count - 1; i++)
+                    {
+                        if (i + 1 >= pathCache.Count) continue;
+                        Gizmos.DrawLine(pathCache[i], pathCache[i + 1]);
+                    }
+                }
+            }
+        }
+#endif
 
 
         IArchitecture IBelongToArchitecture.GetArchitecture()

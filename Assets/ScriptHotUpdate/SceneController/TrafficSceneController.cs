@@ -24,7 +24,7 @@ namespace UG20260527
             {
                 if(gameObject.name == "GameRoot")
                 {
-                    gameObject.GetComponentInChildren<VehicleSpawnController>().Init();
+                    //gameObject.GetComponentInChildren<VehicleSpawnController>().Init();
                 }
             }
         }

@@ -1,26 +1,36 @@
 ﻿using System.Collections;
 using UnityEngine;
 using QFramework;
-using Cysharp.Threading.Tasks;
-using UnityEngine.SceneManagement;
+using System.Collections.Generic;
 
 namespace UG20260527
 {
     public class VehicleSpawnController : MonoBehaviour, IController
     {
         public GameObject prefab;
-        public Transform spawnPoint;
+        public PathsPresetController pathsPresetController;
 
-        public void Init()
+        public async void Init()
         {
-            GameObject obj;
-            obj = this.GetSystem<IResourceSystem>().Instantiate(prefab, gameObject.scene);
-            obj.transform.position = spawnPoint.position;
+            List<GameObject> prefabList = new List<GameObject>();
+
+            IResourceSystem resourceSystem = this.GetSystem<IResourceSystem>();
+            List<string> prefabPaths = resourceSystem.GetPrefabPathInFile("");
+            if (prefabPaths != null && prefabPaths.Count > 0)
+            {
+                foreach (string path in prefabPaths)
+                {
+                    var pre = await resourceSystem.LoadAssetAsync<GameObject>(path);
+                    prefabList.Add(pre);
+                }
+            }
         }
 
         void Start()
         {
-            
+            GameObject obj;
+            obj = this.GetSystem<IResourceSystem>().Instantiate(prefab, gameObject.scene);
+            obj.GetComponent<VehicleController>().Init(pathsPresetController.GetPath(PathsPresetInfo.DirectionType.East, PathsPresetInfo.MovementType.Straight), 15f);
         }
 
 

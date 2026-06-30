@@ -7,6 +7,7 @@ namespace UG20260527
 {
     public class FileTool
     {
+        // 复制 HybirdCLR热更新dll 到 Addressables资源路径
         [MenuItem("MyTool/CopyHotUpdateDll")]
         public static void CopyHotUpdateDll()
         {
@@ -35,5 +36,9 @@ namespace UG20260527
             AssetDatabase.Refresh();  // 刷新Unity的资源库
             Debug.Log($"文件复制成功，路径：{targetPath}");
         }
+
+
+
+       
     }
 }
