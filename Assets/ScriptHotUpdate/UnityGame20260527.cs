@@ -18,6 +18,7 @@ namespace UG20260527
             // 数据层
             RegisterModel<IScoreModel>(new ScoreModel());
             RegisterModel<ISceneModel>(new SceneModel());
+            RegisterModel<ITrafficGameModel>(new TrafficGameModel());
 
             // 工具层
             RegisterUtility<IStorageUtility>(new StorageUtility());

@@ -9,7 +9,20 @@ namespace UG20260527
 {
     public class TrafficSceneController : SceneControllerBase
     {
+        // HUD
         private TrafficSceneHUDPanel _hudPanel;
+
+        // Model数据
+        ITrafficGameModel _gameModel;
+
+        public override async UniTask OnInit(SceneConfigData sceneConfig)
+        {
+            await base.OnInit(sceneConfig);
+
+            // 初始化 Model数据
+            _gameModel = this.GetModel<ITrafficGameModel>();
+            _gameModel.InitModel();
+        }
 
         public override async UniTask OnPreEnter(SceneInstance sceneInstance)
         {

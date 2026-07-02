@@ -30,7 +30,7 @@ namespace UG20260527
         {
             GameObject obj;
             obj = this.GetSystem<IResourceSystem>().Instantiate(prefab, gameObject.scene);
-            obj.GetComponent<VehicleController>().Init(pathsPresetController.GetPath(PathsPresetInfo.DirectionType.East, PathsPresetInfo.MovementType.Straight), 15f);
+            obj.GetComponent<VehicleController>().Init(pathsPresetController.GetPath(PathsPresetInfo.DirectionType.East, PathsPresetInfo.MovementType.TurnLeft), 15f);
         }
 
 

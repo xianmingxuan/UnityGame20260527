@@ -18,11 +18,6 @@ namespace UG20260527
 
         }
 
-        private void FixedUpdate()
-        {
-
-        }
-
         void Update()
         {
             UpdateMovement();
