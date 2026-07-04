@@ -44,7 +44,8 @@ namespace UG20260527
                 //Debug.Log($"{gameObject.name} 撞到了 {comp.gameObject.name}");
                 RecycleSelf();
                 comp.RecycleSelf();
-                _gameModel.HP.Value--;
+                // HP--
+                this.SendCommand<TrafficGameModel_HP_MinusOneCommand>();
             }
         }
 
@@ -122,7 +123,8 @@ namespace UG20260527
         public void RecycleSelf()
         {
             this.GetSystem<IResourceSystem>().Recycle(gameObject);
-            _gameModel.numberOfRecycledVehicles.Value++;
+            // 回收车辆数++
+            this.SendCommand<TrafficGameModel_NumberOfRecycledVehicles_PushOneCommand>();
         }
 
 

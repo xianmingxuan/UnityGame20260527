@@ -77,7 +77,7 @@ namespace UG20260527
             }
 
             // 更新数据
-            _gameModel.SetPath(_pathsCache);
+            this.SendCommand(new TrafficGameModel_PathsCache_SetCommand(_pathsCache));
         }
 
         private List<Vector3> CalculateTurnPath(Vector3 start, Vector3 end, Vector3 mid, float dis, int precision)

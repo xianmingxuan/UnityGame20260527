@@ -1,16 +1,59 @@
 ﻿using QFramework;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace UG20260527
 {
-    public class InitTrafficGameModelCommand : AbstractCommand<AsyncOperationHandle<TextAsset>>
+    /// <summary>
+    /// TrafficGameModel的HP 减一
+    /// </summary>
+    public class TrafficGameModel_HP_MinusOneCommand : AbstractCommand
+    {
+        protected override void OnExecute()
+        {
+            this.GetModel<ITrafficGameModel>().HP.Value--;
+        }
+    }
+
+    /// <summary>
+    /// TrafficGameModel的numberOfRecycledVehicles 加一
+    /// </summary>
+    public class TrafficGameModel_NumberOfRecycledVehicles_PushOneCommand : AbstractCommand
+    {
+        protected override void OnExecute()
+        {
+            this.GetModel<ITrafficGameModel>().numberOfRecycledVehicles.Value++;
+        }
+    }
+
+    /// <summary>
+    /// 设置TrafficGameModel的12条路线缓存
+    /// </summary>
+    public class TrafficGameModel_PathsCache_SetCommand : AbstractCommand
+    {
+        private Dictionary<string, List<Vector3>> paths;
+
+        public TrafficGameModel_PathsCache_SetCommand(Dictionary<string, List<Vector3>> paths)
+        {
+            this.paths = paths;
+        }
+
+        protected override void OnExecute()
+        {
+            this.GetModel<ITrafficGameModel>().SetPath(paths);
+        }
+    }
+
+    /// <summary>
+    /// 初始化 TrafficGameModel 局内数据（返回Handle，可等待）
+    /// </summary>
+    public class TrafficGameModel_InitCommand : AbstractCommand<AsyncOperationHandle<TextAsset>>
     {
         private int _level = 0;
         private ITrafficGameModel _gameModel;
 
-        // 传入数据
-        public InitTrafficGameModelCommand(int Level)
+        public TrafficGameModel_InitCommand(int Level)
         {
             this._level = Level;
         }
