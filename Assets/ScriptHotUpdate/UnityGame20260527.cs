@@ -11,7 +11,6 @@ namespace UG20260527
             RegisterSystem<ICameraSystem>(new CameraSystem());
             RegisterSystem<IInputSystem>(new InputSystem());
             RegisterSystem<IUISystem>(new UISystem());
-            RegisterSystem<IPoolSystem>(new PoolSystem());
             RegisterSystem<IResourceSystem>(new ResourceSystem());
             RegisterSystem<ISceneSystem>(new SceneSystem());
 
@@ -22,6 +21,8 @@ namespace UG20260527
 
             // 工具层
             RegisterUtility<IStorageUtility>(new StorageUtility());
+            RegisterUtility<IPoolUtility>(new PoolUtility());
+
         }
     }
 }

@@ -82,20 +82,7 @@ namespace UG20260527
     }
     public class ResourceSystem : AbstractSystem, IResourceSystem
     {
-        /// <summary>
-        /// 对象池系统
-        /// </summary>
-        private IPoolSystem poolSystem;
-
-
-        protected override void OnInit()
-        {
-            if(poolSystem == null)
-            {
-                poolSystem = this.GetSystem<IPoolSystem>();
-            }
-        }
-
+        protected override void OnInit() { }
 
         /* -------------------------------------------------- 预制体资源 -------------------------------------------------- */
 
@@ -133,7 +120,7 @@ namespace UG20260527
         GameObject IResourceSystem.Instantiate(GameObject prefab, Scene scene, Transform parent, bool worldPositionStays, Action<GameObject> actionOnGet)
         {
             if (parent) scene = parent.gameObject.scene;
-            GameObject obj = poolSystem.Get(prefab, scene, actionOnGet);
+            GameObject obj = this.GetUtility<IPoolUtility>().Get(prefab, scene, actionOnGet);
             obj.transform.SetParent(parent, worldPositionStays);
             return obj;
         }
@@ -151,7 +138,7 @@ namespace UG20260527
         {
             if (parent) scene = parent.gameObject.scene;
             var prefab = await Addressables.LoadAssetAsync<TObject>(path).Task as GameObject;
-            GameObject obj = poolSystem.Get(prefab, scene, actionOnGet);
+            GameObject obj = this.GetUtility<IPoolUtility>().Get(prefab, scene, actionOnGet);
             obj.transform.SetParent(parent, worldPositionStays);
             return obj;
         }
@@ -164,7 +151,7 @@ namespace UG20260527
         /// <returns>不受对象池管理，直接销毁，返回false</returns>
         bool IResourceSystem.Recycle(GameObject obj, Action<GameObject> actionOnRecycle)
         {
-            return poolSystem.Recycle(obj, actionOnRecycle);
+            return this.GetUtility<IPoolUtility>().Recycle(obj, actionOnRecycle);
         }
 
         /// <summary>
@@ -176,7 +163,7 @@ namespace UG20260527
         /// <returns>不受对象池管理，直接销毁，返回false</returns>
         UniTask<bool> IResourceSystem.Recycle(GameObject obj, float delaySecond, Action<GameObject> actionOnRecycle)
         {
-            return poolSystem.Recycle(obj, delaySecond, actionOnRecycle);
+            return this.GetUtility<IPoolUtility>().Recycle(obj, delaySecond, actionOnRecycle);
         }
 
 

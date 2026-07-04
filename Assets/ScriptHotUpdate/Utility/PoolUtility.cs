@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 
 namespace UG20260527
 {
-    public interface IPoolSystem : ISystem
+    public interface IPoolUtility : IUtility
     {
         public void RegisterPrefabPool(GameObject prefab, Scene scene, int defaultCount = 0, int maxCount = 20);
         public GameObject Get(GameObject prefab, Scene scene, Action<GameObject> actionOnGet = null);
@@ -21,7 +21,7 @@ namespace UG20260527
     /// <summary>
     /// 对象池系统
     /// </summary>
-    public class PoolSystem : AbstractSystem, IPoolSystem
+    public class PoolUtility : IPoolUtility
     {
 
         // 场景-对象池：Scene -> Prefab -> gameObject对象池
@@ -33,10 +33,8 @@ namespace UG20260527
         private string _preloadPoolName = "preloadPoolRoot";
         private Transform _preloadPoolRoot;
 
-        protected override void OnInit()
+        public PoolUtility()
         {
-            InitPreloadRoot();
-
             SceneManager.sceneUnloaded += scene =>
             {
                 ClearScenePool(scene);
@@ -130,7 +128,7 @@ namespace UG20260527
         }
 
         // 获取对象
-        GameObject IPoolSystem.Get(GameObject prefab, Scene scene, Action<GameObject> actionOnGet)
+        public GameObject Get(GameObject prefab, Scene scene, Action<GameObject> actionOnGet)
         {
             if(prefab == null) return null;
 
@@ -185,7 +183,7 @@ namespace UG20260527
         }
 
         // 回收对象Delay
-        async UniTask<bool> IPoolSystem.Recycle(GameObject obj, float delaySecond, Action<GameObject> actionOnRecycle)
+        public async UniTask<bool> Recycle(GameObject obj, float delaySecond, Action<GameObject> actionOnRecycle)
         {
             if (obj == null) return false;
             if (delaySecond <= 0)
@@ -200,7 +198,7 @@ namespace UG20260527
         }
 
         // 清空所有对象池
-        void IPoolSystem.ClearAll()
+        public void ClearAll()
         {
             // 清空所有对象池
             foreach(var prefabsPool in _scenePool.Values)
