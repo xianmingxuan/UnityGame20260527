@@ -250,7 +250,8 @@ namespace QFramework
 
     #region Model
 
-    public interface IModel : IBelongToArchitecture, ICanSetArchitecture, ICanGetUtility, ICanSendEvent, ICanInit
+    /* ICanGetSystem 是我后加的，因为之前所有的工具都实现为了Model（对QF框架不熟，后面可能会找时间修改） */
+    public interface IModel : IBelongToArchitecture, ICanSetArchitecture, ICanGetUtility, ICanSendEvent, ICanInit, ICanGetSystem
     {
     }
 

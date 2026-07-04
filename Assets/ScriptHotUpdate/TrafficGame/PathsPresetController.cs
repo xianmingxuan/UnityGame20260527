@@ -1,5 +1,4 @@
-﻿using Codice.CM.Common;
-using QFramework;
+﻿using QFramework;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -31,16 +30,17 @@ namespace UG20260527
     {
         [Tooltip("midPoint->转折点的距离（控制圆的弧度大小）")] public float dis = 1f;
         [Tooltip("弯道细分精度")] public int precision = 20;
+        [Tooltip("路线预设信息列表")] public List<PathsPresetInfo> pathsPresetInfos = new List<PathsPresetInfo>();
 
-        // 路线预设信息列表
-        public List<PathsPresetInfo> pathsPresetInfos = new List<PathsPresetInfo>();
-
+        // 数据
+        private ITrafficGameModel _gameModel;
         // 计算后的路线缓存
         private Dictionary<string, List<Vector3>> _pathsCache = new Dictionary<string, List<Vector3>>();
 
 
         private void Awake()
         {
+            _gameModel = this.GetModel<ITrafficGameModel>();
             CalculateAllPaths();
         }
 
@@ -73,8 +73,11 @@ namespace UG20260527
                 }
 
                 // 加入字典缓存
-                _pathsCache.Add(GetKey(pathInfo.directionType, pathInfo.movementType), pathCache);
+                _pathsCache.Add(_gameModel.GetKey(pathInfo.directionType, pathInfo.movementType), pathCache);
             }
+
+            // 更新数据
+            _gameModel.SetPath(_pathsCache);
         }
 
         private List<Vector3> CalculateTurnPath(Vector3 start, Vector3 end, Vector3 mid, float dis, int precision)
@@ -158,15 +161,7 @@ namespace UG20260527
             return pathCache;
         }
 
-        private string GetKey(PathsPresetInfo.DirectionType directionType, PathsPresetInfo.MovementType movementType)
-        {
-            return $"{directionType}-{movementType}";
-        }
-
-        public List<Vector3> GetPath(PathsPresetInfo.DirectionType directionType, PathsPresetInfo.MovementType movementType)
-        {
-            return _pathsCache[GetKey(directionType, movementType)];
-        }
+        
 
 
 

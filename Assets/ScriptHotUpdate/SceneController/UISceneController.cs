@@ -31,7 +31,7 @@ namespace UG20260527
         {
             await base.OnInit(sceneConfig);
             
-            // 监听：开始加载 PlayScene
+            // 监听：OnInit Scene
             var unRegisterHandle1 = this.RegisterEvent<LoadSceneEvent>(async e =>
             {
                 // 隐藏MainPanel，显示LoadingPanel
@@ -40,16 +40,15 @@ namespace UG20260527
                 await this.GetSystem<IUISystem>().CloseSinglePanel(_mainPanel.panelConfig.panelLayer, new ClosePanelSetting { panelShouldClose = _mainPanel });
             });
 
-            // 监听：进入 PlayScene
-            var unRegisterHandle2 = this.RegisterEvent<EnterSceneEvent>(async e =>
+            // 监听：PreEnter Scene
+            var unRegisterHandle2 = this.RegisterEvent<PreEnterSceneEvent>(async e =>
             {
                 // 隐藏LoadingPanel，显示HUD
                 //Debug.Log($"UI场景控制器 - PreEnter 场景：{e.payload.sceneControllerType.Name}");
-                await UniTask.WaitForSeconds(0.5f);
                 await this.GetSystem<IUISystem>().CloseSinglePanel(PanelLayer.LoadingLayer);
             });
 
-            // 监听：退出 PlayScene
+            // 监听：PreExit PlayScene
             var unRegisterHandle3 = this.RegisterEvent<PreExitSceneEvent>(async e =>
             {
                 //Debug.Log($"退出的场景： {e.exitSceneControllerType.Name}");

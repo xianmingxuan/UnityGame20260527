@@ -202,6 +202,54 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""TrafficGameMap"",
+            ""id"": ""7639391f-f8cd-4827-90d7-ecb2c26acb19"",
+            ""actions"": [
+                {
+                    ""name"": ""ESC"",
+                    ""type"": ""Button"",
+                    ""id"": ""f1ad2e0e-d309-48c5-a985-e24095fbf0d7"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""MouseLeftButton"",
+                    ""type"": ""Button"",
+                    ""id"": ""70dc0f77-e4ac-414e-8457-736873a1930c"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""0c7a4a85-cd2f-4392-8d36-396aec1fce73"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ESC"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""6a95caa2-8e2a-4322-8c5f-c1035a2a980b"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MouseLeftButton"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": [
@@ -222,12 +270,17 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
         m_UIMap_ESC = m_UIMap.FindAction("ESC", throwIfNotFound: true);
         m_UIMap_MouseLeftButton = m_UIMap.FindAction("MouseLeftButton", throwIfNotFound: true);
         m_UIMap_MouseRightButton = m_UIMap.FindAction("MouseRightButton", throwIfNotFound: true);
+        // TrafficGameMap
+        m_TrafficGameMap = asset.FindActionMap("TrafficGameMap", throwIfNotFound: true);
+        m_TrafficGameMap_ESC = m_TrafficGameMap.FindAction("ESC", throwIfNotFound: true);
+        m_TrafficGameMap_MouseLeftButton = m_TrafficGameMap.FindAction("MouseLeftButton", throwIfNotFound: true);
     }
 
     ~@GameControls()
     {
         UnityEngine.Debug.Assert(!m_PlayerMap.enabled, "This will cause a leak and performance issues, GameControls.PlayerMap.Disable() has not been called.");
         UnityEngine.Debug.Assert(!m_UIMap.enabled, "This will cause a leak and performance issues, GameControls.UIMap.Disable() has not been called.");
+        UnityEngine.Debug.Assert(!m_TrafficGameMap.enabled, "This will cause a leak and performance issues, GameControls.TrafficGameMap.Disable() has not been called.");
     }
 
     public void Dispose()
@@ -409,6 +462,60 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
         }
     }
     public UIMapActions @UIMap => new UIMapActions(this);
+
+    // TrafficGameMap
+    private readonly InputActionMap m_TrafficGameMap;
+    private List<ITrafficGameMapActions> m_TrafficGameMapActionsCallbackInterfaces = new List<ITrafficGameMapActions>();
+    private readonly InputAction m_TrafficGameMap_ESC;
+    private readonly InputAction m_TrafficGameMap_MouseLeftButton;
+    public struct TrafficGameMapActions
+    {
+        private @GameControls m_Wrapper;
+        public TrafficGameMapActions(@GameControls wrapper) { m_Wrapper = wrapper; }
+        public InputAction @ESC => m_Wrapper.m_TrafficGameMap_ESC;
+        public InputAction @MouseLeftButton => m_Wrapper.m_TrafficGameMap_MouseLeftButton;
+        public InputActionMap Get() { return m_Wrapper.m_TrafficGameMap; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(TrafficGameMapActions set) { return set.Get(); }
+        public void AddCallbacks(ITrafficGameMapActions instance)
+        {
+            if (instance == null || m_Wrapper.m_TrafficGameMapActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_TrafficGameMapActionsCallbackInterfaces.Add(instance);
+            @ESC.started += instance.OnESC;
+            @ESC.performed += instance.OnESC;
+            @ESC.canceled += instance.OnESC;
+            @MouseLeftButton.started += instance.OnMouseLeftButton;
+            @MouseLeftButton.performed += instance.OnMouseLeftButton;
+            @MouseLeftButton.canceled += instance.OnMouseLeftButton;
+        }
+
+        private void UnregisterCallbacks(ITrafficGameMapActions instance)
+        {
+            @ESC.started -= instance.OnESC;
+            @ESC.performed -= instance.OnESC;
+            @ESC.canceled -= instance.OnESC;
+            @MouseLeftButton.started -= instance.OnMouseLeftButton;
+            @MouseLeftButton.performed -= instance.OnMouseLeftButton;
+            @MouseLeftButton.canceled -= instance.OnMouseLeftButton;
+        }
+
+        public void RemoveCallbacks(ITrafficGameMapActions instance)
+        {
+            if (m_Wrapper.m_TrafficGameMapActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(ITrafficGameMapActions instance)
+        {
+            foreach (var item in m_Wrapper.m_TrafficGameMapActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_TrafficGameMapActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public TrafficGameMapActions @TrafficGameMap => new TrafficGameMapActions(this);
     private int m_KeyboardSchemeIndex = -1;
     public InputControlScheme KeyboardScheme
     {
@@ -429,5 +536,10 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
         void OnESC(InputAction.CallbackContext context);
         void OnMouseLeftButton(InputAction.CallbackContext context);
         void OnMouseRightButton(InputAction.CallbackContext context);
+    }
+    public interface ITrafficGameMapActions
+    {
+        void OnESC(InputAction.CallbackContext context);
+        void OnMouseLeftButton(InputAction.CallbackContext context);
     }
 }

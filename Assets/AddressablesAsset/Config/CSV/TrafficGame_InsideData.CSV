@@ -1,0 +1,5 @@
+Level,HP,NumberOfVehicles,VehicleSpeedRange
+0,5,10,10~10
+1,5,20,10~15
+2,10,40,5~15
+3,10,100,15~25

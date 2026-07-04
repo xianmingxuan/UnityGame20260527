@@ -102,12 +102,12 @@ namespace UG20260527
         {
             var payload = await this.GetSystem<ISceneSystem>().EnterScencePayLoadAsync<TrafficSceneController>();
 
-            Debug.Log($"OnInit 场景：{payload.sceneControllerType.Name}");
+            //Debug.Log($"OnInit 场景：{payload.sceneControllerType.Name}");
             this.SendEvent(new LoadSceneEvent(payload));
 
             payload.onPreEnterComplete += v =>
             {
-                Debug.Log($"PreEnter 场景：{payload.sceneControllerType.Name}");
+                //Debug.Log($"PreEnter 场景：{payload.sceneControllerType.Name}");
                 this.SendEvent(new PreEnterSceneEvent(payload));
             };
 
@@ -127,7 +127,7 @@ namespace UG20260527
         protected override async void OnExecute()
         {
             // 通知：准备退出 PlayScene
-            Debug.Log($"PreExit 场景：{typeof(TrafficSceneController).Name}");
+            //Debug.Log($"PreExit 场景：{typeof(TrafficSceneController).Name}");
             this.SendEvent(new PreExitSceneEvent(typeof(TrafficSceneController)));
 
             // 等待退出中

@@ -180,6 +180,54 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "TrafficGameMap",
+            "id": "7639391f-f8cd-4827-90d7-ecb2c26acb19",
+            "actions": [
+                {
+                    "name": "ESC",
+                    "type": "Button",
+                    "id": "f1ad2e0e-d309-48c5-a985-e24095fbf0d7",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "MouseLeftButton",
+                    "type": "Button",
+                    "id": "70dc0f77-e4ac-414e-8457-736873a1930c",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "0c7a4a85-cd2f-4392-8d36-396aec1fce73",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ESC",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "6a95caa2-8e2a-4322-8c5f-c1035a2a980b",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "MouseLeftButton",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": [

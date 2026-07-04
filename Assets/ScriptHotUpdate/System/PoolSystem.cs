@@ -160,9 +160,17 @@ namespace UG20260527
             if (obj == null) return false;
             if (!_activePool.ContainsKey(obj))
             {
-                Debug.Log($"{obj.name} 不受对象池管理，无法释放，直接销毁");
-                GameObject.Destroy(obj);
-                return false;
+                if (obj.activeSelf == true)
+                {
+                    Debug.Log($"{obj.name} 不受对象池管理，无法释放，直接销毁");
+                    GameObject.Destroy(obj);
+                    return false;
+                }
+                else
+                {
+                    // 重复回收
+                    return false;
+                }
             }
 
             // 回收

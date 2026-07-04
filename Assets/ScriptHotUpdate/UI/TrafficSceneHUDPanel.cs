@@ -21,11 +21,30 @@ namespace UG20260527
             // 获取游戏数据
             _gameModel = this.GetModel<ITrafficGameModel>();
 
+            // Level
+            unRegisters.Add(_gameModel.Level.RegisterWithInitValue(value =>
+            {
+                var text_Level = GetComponentInChildren<Text>("Text_Level");
+                if(text_Level != null) text_Level.text = value.ToString();
+            }));
+
             // HP
             unRegisters.Add(_gameModel.HP.RegisterWithInitValue(value =>
             {
                 var text_HP = GetComponentInChildren<Text>("Text_HP");
                 if(text_HP != null) text_HP.text = value.ToString();
+            }));
+
+            unRegisters.Add(_gameModel.numberOfVehicles.RegisterWithInitValue(value =>
+            {
+                var text_NumberOfVehicles = GetComponentInChildren<Text>("Text_NumberOfVehicles");
+                if (text_NumberOfVehicles != null) text_NumberOfVehicles.text = value.ToString();
+            }));
+
+            unRegisters.Add(_gameModel.numberOfRecycledVehicles.RegisterWithInitValue(value =>
+            {
+                var text_NumberOfRecycledVehicles = GetComponentInChildren<Text>("Text_NumberOfRecycledVehicles");
+                if (text_NumberOfRecycledVehicles != null) text_NumberOfRecycledVehicles.text = value.ToString();
             }));
 
             // 绑定监听
@@ -44,6 +63,7 @@ namespace UG20260527
             {
                 unRegister.UnRegister();
             }
+            unRegisters.Clear();
 
             GetComponentInChildren<Button>("Btn_Setting").onClick.RemoveAllListeners();
         }

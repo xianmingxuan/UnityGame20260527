@@ -3,7 +3,7 @@ using System;
 
 namespace UG20260527
 {
-    // OnInit Scene
+    // OnInitScene 场景控制器OnInit执行完成后通知
     public struct LoadSceneEvent
     {
         public LoadSceneControllerPayLoad payload;
@@ -11,15 +11,15 @@ namespace UG20260527
         public LoadSceneEvent(LoadSceneControllerPayLoad payload) { this.payload = payload; }
     }
 
-    // PreEnter Scene
+    // PreEnterScene 场景控制器PreEnter执行完成
     public struct PreEnterSceneEvent
     {
         public LoadSceneControllerPayLoad payload;
 
         public PreEnterSceneEvent(LoadSceneControllerPayLoad payload) { this.payload = payload; }
     }
-    
-    // Enter Scene
+
+    // EnterScene 场景控制器Enter执行完成
     public struct EnterSceneEvent
     {
         public LoadSceneControllerPayLoad payload;
@@ -27,7 +27,7 @@ namespace UG20260527
         public EnterSceneEvent(LoadSceneControllerPayLoad payload) { this.payload = payload; }
     }
 
-    // PreExit Scene
+    // PreExitScene 场景控制器PreExit执行前通知
     public struct PreExitSceneEvent
     {
         public Type exitSceneControllerType;
@@ -38,7 +38,7 @@ namespace UG20260527
         }
     }
 
-    // Exit Scene
+    // ExitScene 场景控制器PreExit执行完成后通知
     public struct ExitSceneEvent
     {
         public Type exitSceneControllerType;
