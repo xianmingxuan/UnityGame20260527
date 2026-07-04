@@ -1,5 +1,4 @@
-﻿using Cysharp.Threading.Tasks;
-using QFramework;
+﻿using QFramework;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -27,6 +26,10 @@ namespace UG20260527
         /* ---------------------------------------------- 数据 --------------------------------------------- */
 
         /// <summary>
+        /// CSV表加载路径
+        /// </summary>
+        public BindableProperty<string> insideDataPath { get; }
+        /// <summary>
         /// 当前所在关卡
         /// </summary>
         public BindableProperty<int> Level { get; set; }
@@ -47,15 +50,15 @@ namespace UG20260527
         /* ---------------------------------------------- 函数 --------------------------------------------- */
 
         /// <summary>
-        /// 初始化 Model局内数据
+        /// 设置CSV局内数据
         /// </summary>
-        public UniTask InitModel(int level);
-
+        /// <param name="data"></param>
+        public void SetCSVInsideData(TrafficGame_InsideData data);
         /// <summary>
-        /// CSV局内数据
+        /// 获取CSV局内数据
         /// </summary>
         /// <returns></returns>
-        public TrafficGame_InsideData GetInsideData();
+        public TrafficGame_InsideData GetCSVInsideData();
 
         // 12条路线缓存
         public string GetKey(PathsPresetInfo.DirectionType directionType, PathsPresetInfo.MovementType movementType);
@@ -70,8 +73,8 @@ namespace UG20260527
         /* ---------------------------------------------- 局内数据 --------------------------------------------- */
 
         // 局内数据（读表）
-        private string _insideDataPath = "Assets/AddressablesAsset/Config/CSV/TrafficGame_InsideData.CSV";
-        public TrafficGame_InsideData _insideData {  get; private set; }
+        public BindableProperty<string> insideDataPath { get; private set; } = new BindableProperty<string>("Assets/AddressablesAsset/Config/CSV/TrafficGame_InsideData.CSV");
+        public TrafficGame_InsideData _insideData;
 
         // Level
         public BindableProperty<int> Level { get; set; } = new BindableProperty<int>();
@@ -93,63 +96,16 @@ namespace UG20260527
         protected override void OnInit() { }
 
 
-        /* ---------------------------------------------- API函数 --------------------------------------------- */
-
-        // 初始化局内数据（根据关卡索引）
-        public async UniTask InitModel(int level)
-        {
-            // 反序列化读表，初始化局内属性
-            TextAsset csvFile = await this.GetSystem<IResourceSystem>().LoadAssetAsync<TextAsset>(_insideDataPath);
-            _insideData = ParseCSV(csvFile.text, level);
-
-            // Level
-            Level.Value = _insideData.Level;
-            // HP
-            HP.Value = _insideData.HP;
-            // 车辆总数
-            numberOfVehicles.Value = _insideData.NumberOfVehicles;
-            numberOfRecycledVehicles.Value = 0;
-            // 车辆速度范围
-
-        }
-
-
         /* ---------------------------------------------- TrafficGame_InsideData局内数据 API --------------------------------------------- */
 
-        // 解析CSV数据
-        private TrafficGame_InsideData ParseCSV(string csvText, int levelIndex)
+        // 设置CSV局内数据
+        public void SetCSVInsideData(TrafficGame_InsideData data)
         {
-            TrafficGame_InsideData tempInsideData = new TrafficGame_InsideData();
-            // 按 行 分割数据
-            string[] lines = csvText.Split('\n');
-            if (levelIndex >= lines.Length - 2)  // 这里 Length - 2，要排除 表头 和 尾部自动生成的空行
-            {
-                Debug.LogWarning($"TrafficGame 没有 关卡{levelIndex} 对应的局内数据");
-                return tempInsideData;
-            }
-            // 读取 对应关卡行 的数据，用 逗号分割
-            string[] header = lines[0].Split(',');
-            string[] data = lines[levelIndex + 1].Split(',');
-            for (int i = 0; i < header.Length; i++)
-            {
-                switch (header[i].Trim())
-                {
-                    case "Level": tempInsideData.Level = int.Parse(data[i].Trim()); break;
-                    case "HP": tempInsideData.HP = int.Parse(data[i].Trim()); break;
-                    case "NumberOfVehicles": tempInsideData.NumberOfVehicles = int.Parse(data[i].Trim()); break;
-                    case "VehicleSpeedRange":
-                        string[] range = data[i].Split('~');
-                        tempInsideData.VehicleMinSpeed = int.Parse(range[0].Trim());
-                        tempInsideData.VehicleMaxSpeed = int.Parse(range[1].Trim());
-                        break;
-                }
-            }
-
-            return tempInsideData;
+            _insideData = data;
         }
 
         // 返回CSV局内数据
-        public TrafficGame_InsideData GetInsideData()
+        public TrafficGame_InsideData GetCSVInsideData()
         {
             return _insideData;
         }

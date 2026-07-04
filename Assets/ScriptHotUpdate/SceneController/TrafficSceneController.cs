@@ -24,7 +24,8 @@ namespace UG20260527
 
             // 初始化 Model数据
             _gameModel = this.GetModel<ITrafficGameModel>();
-            await _gameModel.InitModel(3);
+            var handle = this.SendCommand(new InitTrafficGameModelCommand(2));
+            await handle.Task;
         }
 
         public override async UniTask OnPreEnter(SceneInstance sceneInstance)

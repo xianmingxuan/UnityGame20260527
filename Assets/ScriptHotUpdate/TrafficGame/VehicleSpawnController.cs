@@ -52,7 +52,7 @@ namespace UG20260527
                 // 车辆属性
                 PathsPresetInfo.DirectionType directionType = (PathsPresetInfo.DirectionType)Random.Range(0, 4);
                 PathsPresetInfo.MovementType movementType = (PathsPresetInfo.MovementType)Random.Range(0, 3);
-                obj.GetComponent<VehicleController>().Init(directionType, movementType, Random.Range(_gameModel.GetInsideData().VehicleMinSpeed, _gameModel.GetInsideData().VehicleMaxSpeed));
+                obj.GetComponent<VehicleController>().Init(directionType, movementType, Random.Range(_gameModel.GetCSVInsideData().VehicleMinSpeed, _gameModel.GetCSVInsideData().VehicleMaxSpeed));
                 // 出车间隔时间
                 await UniTask.WaitForSeconds(Random.Range(1, 3));
             }
