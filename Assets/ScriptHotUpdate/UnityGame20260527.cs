@@ -22,6 +22,7 @@ namespace UG20260527
             // 工具层
             RegisterUtility<IStorageUtility>(new StorageUtility());
             RegisterUtility<IPoolUtility>(new PoolUtility());
+            RegisterUtility<IPersistenceUtility>(new PersistenceUtility());
 
         }
     }
