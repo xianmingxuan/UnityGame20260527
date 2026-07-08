@@ -2,16 +2,32 @@
 using QFramework;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace UG20260527
 {
+    [System.Serializable]
+    public class SaveGameData
+    {
+        public int levelIndex = 0;
+
+        public SaveGameData(int levelIndex)
+        {
+            this.levelIndex = levelIndex;
+        }
+    }
+
+
     /// <summary>
     /// 游戏存档面板
     /// </summary>
     public class SaveGamePanel : PanelBase
     {
+        // 游戏存档系统
+        private ISaveGameSystem _saveGameSystem;
+
         // UI 绑定
         private Button Btn_CreateSaveGame;
         private Button Btn_DeleteSaveGame;
@@ -34,6 +50,8 @@ namespace UG20260527
         {
             await base.OnInit(onInit, userData);
 
+            // 存档系统
+            _saveGameSystem = this.GetSystem<ISaveGameSystem>();
             // 无限滚动视口脚本
             scroll = GetComponentInChildren<LoopScrollView>("Scroll View");
             // UI
@@ -50,7 +68,7 @@ namespace UG20260527
                 item = await this.GetSystem<IUISystem>().OpenSinglePanel<SaveGameItem>
                 (
                     null, 
-                    new SaveGameItemData(0),
+                    new SaveGameItemData("000", 0),
                     new OpenPanelSetting { isPushStack = false, isSetLayerParent = false }
                 );
                 item.transform.SetParent(scroll.content);
@@ -76,7 +94,9 @@ namespace UG20260527
             Btn_CreateSaveGame?.onClick.AddListener(async () =>
             {
                 // 新建空白存档 并 更新Item数据列表
-                _saveGameModel.saveGames.Value.Add(0);
+                string saveGameName;
+                if (_saveGameSystem.CreateNewSaveGame(new SaveGameData(66), out saveGameName) == false) return;
+                // 更新Item数据列表
                 UpdataItemDatas();
                 // 回收 无限滚动列表
                 scroll.Recycle();
@@ -85,14 +105,29 @@ namespace UG20260527
 
             });
             // 删除存档
-            Btn_DeleteSaveGame?.onClick.AddListener(() =>
+            Btn_DeleteSaveGame?.onClick.AddListener(async () =>
             {
-
+                if(_saveGameSystem.DeleteSaveGame(_saveGameModel.selectSaveGameKey.Value))
+                {
+                    // 更新Item数据列表
+                    UpdataItemDatas();
+                    // 回收 无限滚动列表
+                    scroll.Recycle();
+                    // 重新初始化 无限滚动列表
+                    itemCacheList = await scroll.InitLoopScrollView<SaveGameItem, SaveGameItemData>(item, itemDatas);
+                }
+                else
+                {
+                    Debug.Log("删除存档失败，选择要删除的存档");
+                }
             });
             // 进入存档
             Btn_EnterSaveGame?.onClick.AddListener(() => 
-            { 
-                
+            {
+                this.SendCommand<EnterTrafficSceneCommand>();
+
+                // 关闭面板
+                this.GetSystem<IUISystem>().CloseSinglePanel(PanelLayer.NormalLayer);
             });
             // 关闭面板
             Btn_Exit?.onClick.AddListener(() =>
@@ -114,15 +149,24 @@ namespace UG20260527
             Btn_DeleteSaveGame?.onClick.RemoveAllListeners();
             Btn_EnterSaveGame?.onClick.RemoveAllListeners();
             Btn_Exit?.onClick.RemoveAllListeners();
+            // 序列化
+            _saveGameSystem.SerializeAll();
         }
 
         private void UpdataItemDatas()
         {
+            // 获取 SaveGame数据
+            List<string> keys = _saveGameModel.saveGames.Value.Keys.ToList();
+            keys.Sort();
+            keys.Reverse();
+
+            // 更新item数据列表
             itemDatas.Clear();
-            for (int i = 0; i < _saveGameModel.saveGames.Value.Count; i++)
+            for (int i = 0; i < keys.Count; i++)
             {
-                int temp = (int)_saveGameModel.saveGames.Value[i];
-                itemDatas.Add(new SaveGameItemData(temp));
+                string jsonString = _saveGameModel.saveGames.Value[keys[i]];
+                SaveGameData data = this.GetUtility<IPersistenceUtility>().FromJson(jsonString, typeof(SaveGameData)) as SaveGameData;
+                itemDatas.Add(new SaveGameItemData(keys[i], data.levelIndex));
             }
         }
 

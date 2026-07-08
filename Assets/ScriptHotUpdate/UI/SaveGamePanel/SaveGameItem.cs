@@ -9,15 +9,20 @@ namespace UG20260527
 {
     public class SaveGameItemData
     {
-        // 具体的存档数据
         /// <summary>
-        /// 关卡索引
+        /// 存档名
+        /// </summary>
+        public string SaveGameName;
+
+        /// <summary>
+        /// 当前关卡
         /// </summary>
         public int levelIndex = 0;
 
 
-        public SaveGameItemData(int levelIndex)
+        public SaveGameItemData(string SaveGameName, int levelIndex)
         {
+            this.SaveGameName = SaveGameName;
             this.levelIndex = levelIndex;
         }
     }
@@ -28,6 +33,7 @@ namespace UG20260527
     public class SaveGameItem : LoopScrollItemBase
     {
         // UI
+        private Text Text_SaveGameName;
         private Text Text_Level;
         private Button Btn_Select;
 
@@ -43,16 +49,18 @@ namespace UG20260527
         {
             await base.OnInit(onInit, userData);
 
+            // UI
+            Text_SaveGameName = GetComponentInChildren<Text>("Text_SaveGameName");
             Text_Level = GetComponentInChildren<Text>("Text_Level");
             Btn_Select = GetComponentInChildren<Button>("Btn_Select");
             _saveGameModel = this.GetModel<ISaveGameModel>();
 
             // 更新数据 --触发-> 更新UI
-            _saveGameModel.selectSaveGameIndex.RegisterWithInitValue(value =>
+            _saveGameModel.selectSaveGameKey.RegisterWithInitValue(value =>
             {
                 if (_data == null) return;
 
-                if(value == _dataIndex)
+                if(value == _data.SaveGameName)
                 {
                     Btn_Select.interactable = false;
                 }
@@ -70,8 +78,7 @@ namespace UG20260527
             Btn_Select.onClick.AddListener(() =>
             {
                 // 手动点击按钮时：更新数据 --触发-> 更新UI
-                this.GetModel<ISaveGameModel>().selectSaveGameIndex.Value = _dataIndex;
-                Debug.Log(_dataIndex);
+                this.GetModel<ISaveGameModel>().selectSaveGameKey.Value = _data.SaveGameName;
             });
         }
 
@@ -97,8 +104,9 @@ namespace UG20260527
             _data = datas[dataIndex] as SaveGameItemData;
 
             // 更新UI
+            Text_SaveGameName.text = _data.SaveGameName.ToString();
             Text_Level.text = _data.levelIndex.ToString();
-            Btn_Select.interactable = !(_saveGameModel.selectSaveGameIndex.Value == _dataIndex);
+            Btn_Select.interactable = !(_saveGameModel.selectSaveGameKey.Value == _data.SaveGameName);
         }
     }
 }

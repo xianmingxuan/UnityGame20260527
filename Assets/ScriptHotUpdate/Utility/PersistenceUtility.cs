@@ -62,6 +62,12 @@ namespace UG20260527
         /// <param name="jsonString"></param>
         /// <returns></returns>
         public T FromJson<T>(string jsonString);
+        /// <summary>
+        /// 数据 转 json
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public string ToJson(object data);
 
     }
 
@@ -164,6 +170,10 @@ namespace UG20260527
             return JsonUtility.FromJson<T>(jsonString);
         }
 
-
+        // 数据 转 json
+        public string ToJson(object data)
+        {
+            return JsonUtility.ToJson(data);
+        }
     }
 }

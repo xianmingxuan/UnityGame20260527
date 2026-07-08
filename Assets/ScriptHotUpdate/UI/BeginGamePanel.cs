@@ -51,7 +51,6 @@ namespace UG20260527
 
             GetComponentInChildren<Button>("Btn_Qualifying")?.onClick.AddListener(() =>
             {
-                //this.SendCommand<EnterTrafficSceneCommand>();
                 this.GetSystem<IUISystem>().OpenSinglePanel<SaveGamePanel>();
             });
         }

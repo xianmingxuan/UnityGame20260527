@@ -13,6 +13,7 @@ namespace UG20260527
             RegisterSystem<IUISystem>(new UISystem());
             RegisterSystem<IResourceSystem>(new ResourceSystem());
             RegisterSystem<ISceneSystem>(new SceneSystem());
+            RegisterSystem<ISaveGameSystem>(new SaveGameSystem());
 
             // 数据层
             RegisterModel<IScoreModel>(new ScoreModel());
