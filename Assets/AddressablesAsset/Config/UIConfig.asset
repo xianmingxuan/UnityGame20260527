@@ -53,6 +53,14 @@ MonoBehaviour:
     panelLayer: 1
     panelPrefab: {fileID: 7676894250834082829, guid: 5b8670a0be9ea63439c7e4f82104a324, type: 3}
     panelTypeName: TrafficSceneHUDPanel
+  - panelScript: {fileID: 11500000, guid: b1e9fcdb4ce92cc4c90bca08dfd54eab, type: 3}
+    panelLayer: 1
+    panelPrefab: {fileID: 3712744123509393568, guid: cdd2f2e6f7bbf8a4ca6f1213a959671e, type: 3}
+    panelTypeName: SaveGamePanel
+  - panelScript: {fileID: 11500000, guid: e292724e863606e42a01d7e768e76880, type: 3}
+    panelLayer: 1
+    panelPrefab: {fileID: 795241216077549518, guid: 9c49eb0853a339f41bf744c2b142bbf2, type: 3}
+    panelTypeName: SaveGameItem
   serializePanelConfigList:
   - panelLayer: 1
     panelAssetPath: Assets/AddressablesAsset/Prefabs/UI/MainPanel.prefab
@@ -84,3 +92,9 @@ MonoBehaviour:
   - panelLayer: 1
     panelAssetPath: Assets/AddressablesAsset/Prefabs/UI/TrafficSceneHUDPanel.prefab
     panelTypeName: TrafficSceneHUDPanel
+  - panelLayer: 1
+    panelAssetPath: Assets/AddressablesAsset/Prefabs/UI/SaveGamePanel/SaveGamePanel.prefab
+    panelTypeName: SaveGamePanel
+  - panelLayer: 1
+    panelAssetPath: Assets/AddressablesAsset/Prefabs/UI/SaveGamePanel/SaveGameItem.prefab
+    panelTypeName: SaveGameItem

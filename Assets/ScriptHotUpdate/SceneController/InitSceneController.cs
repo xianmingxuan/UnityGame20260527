@@ -1,16 +1,15 @@
 ﻿using QFramework;
-using System.Collections;
 using UnityEngine;
 
 namespace UG20260527
 {
     public class InitSceneController : MonoBehaviour, IController
     {
-        // 场景系统
-        private ISceneSystem _sceneSystem;
+        private ISceneSystem _sceneSystem; //场景系统
 
         private void Awake()
         {
+            // 初始化引用
             _sceneSystem = this.GetSystem<ISceneSystem>();
         }
 

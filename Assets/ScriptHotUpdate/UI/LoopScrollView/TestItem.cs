@@ -65,10 +65,10 @@ namespace UG20260527
             GetComponentInChildren<Button>("Button").onClick.RemoveAllListeners();
         }
 
-        public override void UpdataItem(object data, int dataIndex)
+        public override void UpdataItem(List<object> datas, int dataIndex)
         {
             _dataIndex = dataIndex;
-            _itemData = data as TestItemData;
+            _itemData = datas[dataIndex] as TestItemData;
             _text.text = dataIndex.ToString();
             if (_itemData.select) _img.color = Color.red;
             else _img.color = _color;

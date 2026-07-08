@@ -1,7 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using QFramework;
 using System;
-using UnityEngine;
 using UnityEngine.UI;
 
 namespace UG20260527
@@ -52,7 +51,8 @@ namespace UG20260527
 
             GetComponentInChildren<Button>("Btn_Qualifying")?.onClick.AddListener(() =>
             {
-                this.SendCommand<EnterTrafficSceneCommand>();
+                //this.SendCommand<EnterTrafficSceneCommand>();
+                this.GetSystem<IUISystem>().OpenSinglePanel<SaveGamePanel>();
             });
         }
 

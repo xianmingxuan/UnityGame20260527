@@ -58,9 +58,9 @@ namespace UG20260527
         /// </summary>
         /// <param name="data"></param>
         /// <param name="index"></param>
-        public virtual void UpdataItem(object data, int dataIndex)
+        public virtual void UpdataItem(List<object> datas, int dataIndex)
         {
-            userData = data;
+            userData = datas[dataIndex];
         }
     }
 
@@ -76,35 +76,61 @@ namespace UG20260527
             Horizontal
         }
 
-        // 滚动类型
+        /// <summary>
+        /// 滚动类型
+        /// </summary>
         public ScrollType scrollType;
-        // 滚动组件
+        /// <summary>
+        /// 滚动组件
+        /// </summary>
         public ScrollRect scrollRect;
-        // 滚动内容容器Transform
+        /// <summary>
+        /// 滚动内容容器Transform
+        /// </summary>
         public RectTransform content;
-        // 外层视口
+        /// <summary>
+        /// 外层视口
+        /// </summary>
         public RectTransform viewPort;
 
-        // Item水平间距
+        /// <summary>
+        /// Item水平间距
+        /// </summary>
         public float itemHorizontalSpace;
-        // Item垂直间距
+        /// <summary>
+        /// Item垂直间距
+        /// </summary>
         public float itemVerticalSpace;
 
 
-        // 数据列表
+        /// <summary>
+        /// 数据列表
+        /// </summary>
         private List<object> _dataList;
-        // Item缓存列表
+        /// <summary>
+        /// Item缓存列表
+        /// </summary>
         private List<LoopScrollItemBase> _itemCacheList = new List<LoopScrollItemBase>();
-        // Item尺寸，宽高（动态获取）
+        /// <summary>
+        /// Item尺寸，宽高（动态获取）
+        /// </summary>
         private Vector2 _itemSize;
-        // item的数量
+        /// <summary>
+        /// item的数量
+        /// </summary>
         private int _ItemCount;
-        // 另一个方向上的item数量（水平移动-表示列个数，垂直移动-表示行个数）
+        /// <summary>
+        /// 另一个方向上的item数量（水平移动-表示列个数，垂直移动-表示行个数）
+        /// </summary>
         private int _itemCountOfOtherAxis;
-        // 当前可视窗口中 排在第一位的Item的DataIndex（垂直移动-表示可视窗口左上角Item的DataIndex）
+        /// <summary>
+        /// 当前可视窗口中 排在第一位的Item的DataIndex（垂直移动-表示可视窗口左上角Item的DataIndex）
+        /// </summary>
         private int _curDataIndex;
 
-        // Item初始化委托（外部绑定的自定义Item显示）
+        /// <summary>
+        /// Item初始化委托（外部绑定的自定义Item显示）
+        /// </summary>
         private Action<LoopScrollItemBase, object, int> _onItemInit;
 
 
@@ -138,13 +164,13 @@ namespace UG20260527
             _curDataIndex = 0;
         }
 
-        // 入口：item预制体，item数据列表
-        public async UniTask InitLoopScrollView<T, U>(T itemSC, List<U> dataList) where T : LoopScrollItemBase
+        // 入口：item脚本，item数据列表
+        public async UniTask<List<LoopScrollItemBase>> InitLoopScrollView<T, U>(T itemSC, List<U> dataList) where T : LoopScrollItemBase
         {
             var sys = this.GetSystem<IUISystem>();
             if (itemSC == null)
             {
-                return;
+                return null;
             }
 
             // 数据列表
@@ -159,7 +185,9 @@ namespace UG20260527
             // 计算 Item数量，另一方向上的item数量，Content锚点，尺寸
             var viewPortTrans = viewPort.GetComponent<RectTransform>();  // 可见范围
             int itemCountOfHorizontal = Mathf.FloorToInt((float)viewPortTrans.rect.width / (_itemSize.x + itemHorizontalSpace));
+            if (itemCountOfHorizontal == 0) itemCountOfHorizontal = 1;
             int itemCountOfVertical = Mathf.FloorToInt((float)viewPortTrans.rect.height / (_itemSize.y + itemHorizontalSpace));
+            if (itemCountOfVertical == 0) itemCountOfVertical = 1;
             // 设置 Content旋转，缩放支点 到左上角
             content.pivot = new Vector2(0, 1);
             switch (scrollType)
@@ -193,6 +221,8 @@ namespace UG20260527
 
             // 先更新一次
             OnValueChanged(content.position);
+
+            return _itemCacheList;
         }
 
         // 初始化Item
@@ -216,7 +246,17 @@ namespace UG20260527
 
         private void UpdateItemData(LoopScrollItemBase item, int dataIndex)
         {
-            item.UpdataItem(_dataList[dataIndex], dataIndex);
+            if (dataIndex >= _dataList.Count)  // 数据量 <= 显示窗口Item的数量
+            {
+                // 将多出的item隐藏
+                item.gameObject.SetActive(false);
+            }
+            else  // 数据量 > 显示窗口Item的数量
+            {
+                // 显示所有item，更新数据
+                item.gameObject.SetActive(true);
+                item.UpdataItem(_dataList, dataIndex);
+            }
         }
 
         private void UpdateItemPosition(LoopScrollItemBase item, int dataIndex)
@@ -259,9 +299,15 @@ namespace UG20260527
                 for(int i = 0; i < _itemCacheList.Count; i++)
                 {
                     var dataIndex = _curDataIndex + i;
-                    if (dataIndex >= _dataList.Count) return;
-                    UpdateItemData(_itemCacheList[i], dataIndex);
-                    UpdateItemPosition(_itemCacheList[i], dataIndex);
+                    if (dataIndex < _dataList.Count)
+                    {
+                        UpdateItemData(_itemCacheList[i], dataIndex);
+                        UpdateItemPosition(_itemCacheList[i], dataIndex);
+                    }
+                    else
+                    {
+                        UpdateItemData(_itemCacheList[i], dataIndex);
+                    }
                 }
             }
             else
@@ -272,9 +318,18 @@ namespace UG20260527
                 for (int i = 0; i < _itemCacheList.Count; i++)
                 {
                     int dataIndex = _curDataIndex + i;
-                    if (dataIndex >= _dataList.Count) return;
-                    UpdateItemData(_itemCacheList[i], dataIndex);
-                    UpdateItemPosition(_itemCacheList[i], dataIndex);
+                    if (dataIndex < _dataList.Count)
+                    {
+                        UpdateItemData(_itemCacheList[i], dataIndex);
+                        UpdateItemPosition(_itemCacheList[i], dataIndex);
+                    }
+                    else
+                    {
+                        // 当划到最末尾时，最后2个ItemObj没有对应的ItemData，
+                        // 这时，这2个ItemObj在更新数据时，会自动失活隐藏
+                        // 这时，没必要更新位置，减少计算量
+                        UpdateItemData(_itemCacheList[i], dataIndex);
+                    }
                 }
             }
         }
