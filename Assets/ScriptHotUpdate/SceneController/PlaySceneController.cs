@@ -25,9 +25,9 @@ namespace UG20260527
             this.GetSystem<IInputSystem>().SwitchActionMap("PlayerMap");
         }
 
-        public override async void OnPreExit()
+        public override async UniTask OnPreExit()
         {
-            base.OnPreExit();
+            await base.OnPreExit();
 
             // 隐藏 HUD
             await this.GetSystem<IUISystem>().CloseSinglePanel(_hudPanel.panelConfig.panelLayer, new ClosePanelSetting { panelShouldClose = _hudPanel });

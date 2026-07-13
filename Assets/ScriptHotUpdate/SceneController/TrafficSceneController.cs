@@ -35,6 +35,7 @@ namespace UG20260527
         // 
         private List<IUnRegister> _unRegisterList = new List<IUnRegister>();
 
+        /* -------------------------------------------------- 生命周期 -------------------------------------------------- */
 
         public override async UniTask OnInit(SceneConfigData sceneConfig, object data)
         {
@@ -94,6 +95,9 @@ namespace UG20260527
         {
             await base.OnEnter();
 
+            // HUD 播放Show动画
+            _hudPanel.Anim_ToShow();
+
             // 寻找 场景内的控制器
             List<GameObject> gameObjectsList = new List<GameObject>();
             sceneInstance.Scene.GetRootGameObjects(gameObjectsList);
@@ -107,9 +111,12 @@ namespace UG20260527
             }
         }
 
-        public override async void OnPreExit()
+        public override async UniTask OnPreExit()
         {
-            base.OnPreExit();
+            await base.OnPreExit();
+
+            // HUD 播放Hide动画
+            await UniTask.WaitForSeconds(_hudPanel.Anim_ToHide());
 
             // 隐藏 HUD
             await this.GetSystem<IUISystem>().CloseSinglePanel(_hudPanel.panelConfig.panelLayer, new ClosePanelSetting { panelShouldClose = _hudPanel });

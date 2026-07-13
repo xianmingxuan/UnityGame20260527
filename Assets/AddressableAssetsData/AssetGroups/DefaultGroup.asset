@@ -66,6 +66,13 @@ MonoBehaviour:
     - default
     - texture
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f508d376a28625440b3271da385f4d3b
+    m_Address: Assets/AddressablesAsset/Art/Animation
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - animation
+    - default
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 1eeaa34c2f122524f9062fec01269caf, type: 2}
   m_SchemaSet:

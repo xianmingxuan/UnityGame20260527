@@ -1,6 +1,8 @@
-﻿using QFramework;
-using System.Collections;
+﻿using Cysharp.Threading.Tasks;
+using QFramework;
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,11 +10,27 @@ namespace UG20260527
 {
     public class TrafficSceneHUDPanel : PanelBase
     {
+        // 动画控制器
+        private Animator _animator;
+        private const string ANIMATOR_TOSHOWN = "ToShow";
+        private const string ANIMATOR_TOHIDE = "ToHide";
+
         // 局内游戏数据
         private ITrafficGameModel _gameModel;
 
         // 监听句柄 数组
         private List<IUnRegister> unRegisters = new List<IUnRegister>();
+
+
+        /* -------------------------------------------------- 生命周期 -------------------------------------------------- */
+
+        public override async UniTask OnInit<T>(Action<T> onInit = null, object userData = null)
+        {
+            await base.OnInit(onInit, userData);
+
+            // 动画控制器
+            _animator = GetComponent<Animator>();
+        }
 
         public override void OnOpen()
         {
@@ -67,5 +85,40 @@ namespace UG20260527
 
             GetComponentInChildren<Button>("Btn_Setting").onClick.RemoveAllListeners();
         }
+
+
+        /* -------------------------------------------------- API_动画 -------------------------------------------------- */
+
+        /// <summary>
+        /// 播放显示动画
+        /// </summary>
+        public void Anim_ToShow()
+        {
+            if(_animator != null)
+            {
+                _animator.SetTrigger(ANIMATOR_TOSHOWN);
+            }
+        }
+
+        /// <summary>
+        /// 播放隐藏动画，返回动画时长
+        /// </summary>
+        public float Anim_ToHide()
+        {
+            if(_animator != null)
+            {
+                _animator.SetTrigger(ANIMATOR_TOHIDE);
+                AnimationClip[] arr = _animator.runtimeAnimatorController.animationClips;
+                if(arr.Length > 0)
+                {
+                    foreach(var clipInfo in arr)
+                    {
+                        if(clipInfo.name == "Hide") return clipInfo.length;
+                    }
+                }
+            }
+            return 0;
+        }
+
     }
 }

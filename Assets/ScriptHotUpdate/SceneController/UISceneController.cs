@@ -1,6 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using QFramework;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.ResourceManagement.ResourceProviders;
 
@@ -49,7 +50,15 @@ namespace UG20260527
             });
 
             // 监听：PreExit PlayScene
-            var unRegisterHandle3 = this.RegisterEvent<PreExitSceneEvent>(async e =>
+            //var unRegisterHandle3 = this.RegisterEvent<PreExitSceneEvent>(async e =>
+            //{
+            //    //Debug.Log($"退出的场景： {e.exitSceneControllerType.Name}");
+            //    // 进入UI场景
+            //    await EnterUIScene();
+            //});
+
+            // 监听：Exit PlayScene
+            var unRegisterHandle3 = this.RegisterEvent<ExitSceneEvent>(async e =>
             {
                 //Debug.Log($"退出的场景： {e.exitSceneControllerType.Name}");
                 // 进入UI场景
@@ -77,9 +86,9 @@ namespace UG20260527
         /// <summary>
         /// 销毁UI场景
         /// </summary>
-        public override void OnPreExit()
+        public override async UniTask OnPreExit()
         {
-            base.OnPreExit();
+            await base.OnPreExit();
 
             // 注销 临时监听
             UnRegisterTempList();

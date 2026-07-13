@@ -276,7 +276,7 @@ namespace UG20260527
             _sceneControllerDict.Remove(typeof(T).Name);
 
             // 调用 生命周期函数，并卸载
-            sceneController.OnPreExit();
+            await sceneController.OnPreExit();
             await this.GetSystem<IResourceSystem>().UnLoadScenceAsync(sceneController.sceneInstance);
             sceneController.OnExit();
 
@@ -354,7 +354,10 @@ namespace UG20260527
         /// <summary>
         /// 准备 退出场景（序列化局内玩家数据，等）
         /// </summary>
-        public virtual void OnPreExit() { }
+        public virtual UniTask OnPreExit() 
+        {
+            return UniTask.CompletedTask;
+        }
 
         /// <summary>
         /// 已经 退出场景（卸载内存资源）
