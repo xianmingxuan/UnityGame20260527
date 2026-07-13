@@ -7,6 +7,8 @@ using UnityEngine;
 
 namespace UG20260527
 {
+    
+
     public interface ISaveGameSystem : ISystem
     {
         /// <summary>
@@ -14,7 +16,7 @@ namespace UG20260527
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public bool CreateNewSaveGame(object data, out string key);
+        public bool CreateNewSaveGame(object data, out string key, string saveGameName = "");
         /// <summary>
         /// 删除存档 根据存档名
         /// </summary>
@@ -131,10 +133,11 @@ namespace UG20260527
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public bool CreateNewSaveGame(object data, out string key)
+        public bool CreateNewSaveGame(object data, out string key, string saveGameName = "")
         {
             // key 文件名
-            string fileName = GetSaveName();
+            string fileName = GetJsonFileNameByTime();
+            if (!String.IsNullOrEmpty(saveGameName)) fileName = saveGameName + "_" + fileName;
             // value jsonString
             string jsonString = _persistenceUtility.ToJson(data);
 
@@ -174,14 +177,14 @@ namespace UG20260527
         }
 
         /// <summary>
-        /// 生成 存档名
+        /// 生成Json文件名（.json） 根据 当前时间
         /// </summary>
         /// <returns></returns>
-        private string GetSaveName()
+        private string GetJsonFileNameByTime()
         {
             string timeNow = DateTime.Now.ToString();
             char[] invalidChars = Path.GetInvalidFileNameChars();
-            string fileName = $"save.{new string(timeNow.Where(ch => !invalidChars.Contains(ch)).ToArray()).Replace(" ", "")}.json";
+            string fileName = $"{new string(timeNow.Where(ch => !invalidChars.Contains(ch)).ToArray()).Replace(" ", "")}.json";
 
             return fileName;
         }

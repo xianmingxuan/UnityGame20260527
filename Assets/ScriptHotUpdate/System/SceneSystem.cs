@@ -92,14 +92,14 @@ namespace UG20260527
         /// <typeparam name="T">SceneController类型</typeparam>
         /// <param name="activeOnLoad">是否直接激活场景</param>
         /// <returns></returns>
-        public UniTask<T> EnterScenceAsync<T>(bool activeOnLoad = true) where T : SceneControllerBase, new();
+        public UniTask<T> EnterScenceAsync<T>(object data = null, bool activeOnLoad = true) where T : SceneControllerBase, new();
         /// <summary>
         /// 加载并进入场景，返回 加载场景控制器载荷
         /// </summary>
         /// <typeparam name="T">SceneController类型</typeparam>
         /// <param name="activeOnLoad">是否直接激活场景</param>
         /// <returns>加载场景控制器 载荷</returns>
-        public UniTask<LoadSceneControllerPayLoad> EnterScencePayLoadAsync<T>(bool activeOnLoad = true) where T : SceneControllerBase, new();
+        public UniTask<LoadSceneControllerPayLoad> EnterScencePayLoadAsync<T>(object data = null, bool activeOnLoad = true) where T : SceneControllerBase, new();
         /// <summary>
         /// 退出场景
         /// </summary>
@@ -161,7 +161,7 @@ namespace UG20260527
         /// <typeparam name="T">SceneController类型</typeparam>
         /// <param name="activeOnLoad">是否直接激活场景</param>
         /// <returns></returns>
-        async UniTask<T> ISceneSystem.EnterScenceAsync<T>(bool activeOnLoad)
+        public async UniTask<T> EnterScenceAsync<T>(object data = null, bool activeOnLoad = true) where T : SceneControllerBase, new()
         {
             // Scene配置
             if(sceneConfig == null) await LoadSceneConfig();
@@ -181,7 +181,7 @@ namespace UG20260527
             // 创建 场景管理器
             T sceneController = new T();
             _sceneControllerDict.Add(typeof(T).Name, sceneController);
-            await sceneController.OnInit(sceneConfig.sceneConfigDict[typeof(T).Name]);
+            await sceneController.OnInit(sceneConfig.sceneConfigDict[typeof(T).Name], data);
 
             // 加载并进入场景
             var sceneInstance = await this.GetSystem<IResourceSystem>().LoadScenceAsync(
@@ -204,7 +204,7 @@ namespace UG20260527
         /// <typeparam name="T">SceneController类型</typeparam>
         /// <param name="activeOnLoad">是否直接激活场景</param>
         /// <returns>加载场景控制器 载荷</returns>
-        async UniTask<LoadSceneControllerPayLoad> ISceneSystem.EnterScencePayLoadAsync<T>(bool activeOnLoad)
+        public async UniTask<LoadSceneControllerPayLoad> EnterScencePayLoadAsync<T>(object data = null, bool activeOnLoad = true) where T : SceneControllerBase, new()
         {
             // Scene配置
             if (sceneConfig == null) await LoadSceneConfig();
@@ -228,7 +228,7 @@ namespace UG20260527
             // 创建 场景管理器
             T sceneController = new T();
             _sceneControllerDict.Add(typeof(T).Name, sceneController);
-            await sceneController.OnInit(sceneConfig.sceneConfigDict[typeof(T).Name]);
+            await sceneController.OnInit(sceneConfig.sceneConfigDict[typeof(T).Name], data);
 
             // 异步加载场景
             var handle = this.GetSystem<IResourceSystem>().LoadScenceHandleAsync(
@@ -322,7 +322,7 @@ namespace UG20260527
         /// <summary>
         /// 自身初始化（预加载相关资源 到 内存中）
         /// </summary>
-        public virtual UniTask OnInit(SceneConfigData sceneConfig)
+        public virtual UniTask OnInit(SceneConfigData sceneConfig, object data)
         {
             // 异步初始化
             this.sceneConfig = sceneConfig;

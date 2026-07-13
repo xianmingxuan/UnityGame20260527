@@ -27,9 +27,9 @@ namespace UG20260527
         /// 初始化
         /// </summary>
         /// <returns></returns>
-        public override async UniTask OnInit(SceneConfigData sceneConfig)
+        public override async UniTask OnInit(SceneConfigData sceneConfig, object data)
         {
-            await base.OnInit(sceneConfig);
+            await base.OnInit(sceneConfig, data);
             
             // 监听：OnInit Scene
             var unRegisterHandle1 = this.RegisterEvent<LoadSceneEvent>(async e =>

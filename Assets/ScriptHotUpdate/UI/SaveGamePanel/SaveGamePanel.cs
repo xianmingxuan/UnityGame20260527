@@ -8,17 +8,6 @@ using UnityEngine.UI;
 
 namespace UG20260527
 {
-    [System.Serializable]
-    public class SaveGameData
-    {
-        public int levelIndex = 0;
-
-        public SaveGameData(int levelIndex)
-        {
-            this.levelIndex = levelIndex;
-        }
-    }
-
 
     /// <summary>
     /// 游戏存档面板
@@ -95,7 +84,7 @@ namespace UG20260527
             {
                 // 新建空白存档 并 更新Item数据列表
                 string saveGameName;
-                if (_saveGameSystem.CreateNewSaveGame(new SaveGameData(66), out saveGameName) == false) return;
+                if (_saveGameSystem.CreateNewSaveGame(new TrafficGameSaveData(2), out saveGameName) == false) return;
                 // 更新Item数据列表
                 UpdataItemDatas();
                 // 回收 无限滚动列表
@@ -124,7 +113,15 @@ namespace UG20260527
             // 进入存档
             Btn_EnterSaveGame?.onClick.AddListener(() => 
             {
-                this.SendCommand<EnterTrafficSceneCommand>();
+                // 取出选中的存档数据
+                if(!_saveGameModel.saveGames.Value.ContainsKey(_saveGameModel.selectSaveGameKey.Value))
+                {
+                    Debug.Log("进入存档失败，要进入的存档不存在");
+                    return;
+                }
+                string jsonString = _saveGameModel.saveGames.Value[_saveGameModel.selectSaveGameKey.Value];
+                TrafficGameSaveData data = this.GetUtility<IPersistenceUtility>().FromJson(jsonString, typeof(TrafficGameSaveData)) as TrafficGameSaveData;
+                this.SendCommand(new EnterTrafficSceneCommand(data));
 
                 // 关闭面板
                 this.GetSystem<IUISystem>().CloseSinglePanel(PanelLayer.NormalLayer);
@@ -165,7 +162,7 @@ namespace UG20260527
             for (int i = 0; i < keys.Count; i++)
             {
                 string jsonString = _saveGameModel.saveGames.Value[keys[i]];
-                SaveGameData data = this.GetUtility<IPersistenceUtility>().FromJson(jsonString, typeof(SaveGameData)) as SaveGameData;
+                TrafficGameSaveData data = this.GetUtility<IPersistenceUtility>().FromJson(jsonString, typeof(TrafficGameSaveData)) as TrafficGameSaveData;
                 itemDatas.Add(new SaveGameItemData(keys[i], data.levelIndex));
             }
         }

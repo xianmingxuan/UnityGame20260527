@@ -48,7 +48,7 @@ namespace UG20260527
         protected override async void OnExecute()
         {
             // 开始加载 PlayScene（UISceneController监听，打开 Loading界面）
-            var payload = await this.GetSystem<ISceneSystem>().EnterScencePayLoadAsync<PlaySceneController>(false);
+            var payload = await this.GetSystem<ISceneSystem>().EnterScencePayLoadAsync<PlaySceneController>(null, false);
             // 通知：开始加载 PlayScene
             Debug.Log($"OnInit 场景：{payload.sceneControllerType.Name}");
             this.SendEvent(new LoadSceneEvent(payload));
@@ -98,9 +98,16 @@ namespace UG20260527
     // 进入 TrafficScene 场景
     public class EnterTrafficSceneCommand : AbstractCommand
     {
+        private object data;
+
+        public EnterTrafficSceneCommand(object data)
+        {
+            this.data = data;
+        }
+
         protected override async void OnExecute()
         {
-            var payload = await this.GetSystem<ISceneSystem>().EnterScencePayLoadAsync<TrafficSceneController>();
+            var payload = await this.GetSystem<ISceneSystem>().EnterScencePayLoadAsync<TrafficSceneController>(data);
 
             //Debug.Log($"OnInit 场景：{payload.sceneControllerType.Name}");
             this.SendEvent(new LoadSceneEvent(payload));

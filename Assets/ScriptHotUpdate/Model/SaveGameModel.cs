@@ -17,7 +17,7 @@ namespace UG20260527
     {
         public BindableProperty<Dictionary<string, string>> saveGames { get; set; } = new BindableProperty<Dictionary<string, string>>(new Dictionary<string, string>());
 
-        public BindableProperty<string> selectSaveGameKey { get; set; } = new BindableProperty<string>();
+        public BindableProperty<string> selectSaveGameKey { get; set; } = new BindableProperty<string>("");
 
 
         protected override void OnInit()

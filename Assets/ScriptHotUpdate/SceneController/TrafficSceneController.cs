@@ -7,6 +7,23 @@ using UnityEngine.ResourceManagement.ResourceProviders;
 
 namespace UG20260527
 {
+    /// <summary>
+    /// TrafficGameData存档
+    /// </summary>
+    [System.Serializable]
+    public class TrafficGameSaveData
+    {
+        /// <summary>
+        /// 当前关卡索引
+        /// </summary>
+        public int levelIndex = 0;
+
+        public TrafficGameSaveData(int levelIndex)
+        {
+            this.levelIndex = levelIndex;
+        }
+    }
+
     public class TrafficSceneController : SceneControllerBase
     {
         // HUD
@@ -19,13 +36,16 @@ namespace UG20260527
         private List<IUnRegister> _unRegisterList = new List<IUnRegister>();
 
 
-        public override async UniTask OnInit(SceneConfigData sceneConfig)
+        public override async UniTask OnInit(SceneConfigData sceneConfig, object data)
         {
-            await base.OnInit(sceneConfig);
+            await base.OnInit(sceneConfig, data);
+
+            // 读取存档信息
+            TrafficGameSaveData trafficGameSaveData = data == null ? new TrafficGameSaveData(0) : data as TrafficGameSaveData;
 
             // 发送命令：初始化 Model数据
             _gameModel = this.GetModel<ITrafficGameModel>();
-            await this.SendCommand(new TrafficGameModel_InitCommand(3));
+            await this.SendCommand(new TrafficGameModel_InitCommand(trafficGameSaveData.levelIndex));
         }
 
         public override async UniTask OnPreEnter(SceneInstance sceneInstance)
