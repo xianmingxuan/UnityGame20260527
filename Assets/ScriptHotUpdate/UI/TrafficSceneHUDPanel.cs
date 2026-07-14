@@ -1,8 +1,8 @@
 ﻿using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using QFramework;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -66,10 +66,19 @@ namespace UG20260527
             }));
 
             // 绑定监听
-            GetComponentInChildren<Button>("Btn_Setting").onClick.AddListener(() =>
+            GetComponentInChildren<Button>("Btn_Setting", out Button comp).onClick.AddListener(() =>
             {
-                // 退出场景
-                this.SendCommand<ExitLatestSceneCommand>();
+                
+                // 震动动画
+                if(comp != null)
+                {
+                    comp.transform.DOShakePosition(1, 10).OnComplete(() =>
+                    {
+                        // 退出场景
+                        this.SendCommand<ExitLatestSceneCommand>();
+                    });
+                }
+
             });
         }
 
