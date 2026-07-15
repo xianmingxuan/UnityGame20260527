@@ -16,7 +16,7 @@ namespace UG20260527
 
             // 操作路径
             string sourcePath = $@"{projectRootDirectory}\HybridCLRData\HotUpdateDlls\StandaloneWindows64\HotUpdate.dll";
-            string targetDirectory = $@"{projectRootDirectory}\Assets\AddressablesAsset\Assembly\StandaloneWindows64";
+            string targetDirectory = $@"{projectRootDirectory}\Assets\Res_HotUpdate\Assembly\StandaloneWindows64";
             string Rename = "HotUpdate.dll.bytes";
 
             if (string.IsNullOrWhiteSpace(sourcePath) || !File.Exists(sourcePath))

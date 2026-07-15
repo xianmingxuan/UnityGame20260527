@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Prefab_UI
+  m_EditorClassIdentifier: 
+  m_GroupName: Prefab_UI
+  m_Data:
+    m_SerializedData: []
+  m_GUID: 4ab05b0e12bdf464d9e71ff6cdc9b3bd
+  m_SerializeEntries:
+  - m_GUID: 072325ccbebf25146b1802825af39a76
+    m_Address: Assets/Res_HotUpdate/Prefabs/UI/LoadingPanel.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 66c063bbb77cfbf4bb1d18db01147e48
+    m_Address: Assets/Res_HotUpdate/Prefabs/UI/BeginGamePanel.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9b2dd39e54242f944bedbe72b3022129
+    m_Address: Assets/Res_HotUpdate/Prefabs/UI/MainPanel.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: af55ed16c69796b4a800a3ed2176dd4e
+    m_Address: Assets/Res_HotUpdate/Prefabs/UI/BagPanel.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: afa5ace141c57ce4db6ea9fb3e0ff165
+    m_Address: Assets/Res_HotUpdate/Prefabs/UI/TestPanel.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e550b7e6b77da3243a7f869ae4b391a8
+    m_Address: Assets/Res_HotUpdate/Prefabs/UI/HUDPanel.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 1eeaa34c2f122524f9062fec01269caf, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: c0923b2882603db418492a110d5ccbed, type: 2}
+    - {fileID: 11400000, guid: 81c2973b592cc8a4fa3ffb25fdb4595f, type: 2}

@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 468a46d0ae32c3544b7d98094e6448a9, type: 3}
   m_Name: AddressableAssetSettings
   m_EditorClassIdentifier: 
-  m_DefaultGroup: 7c90e241975fe59449dcfdb65bd0937f
+  m_DefaultGroup: 360fddec964b291448aae7774e25540d
   m_currentHash:
     serializedVersion: 2
-    Hash: 06e4005ce271b1a40f736283d8cc267a
+    Hash: 03491497aa789079fc7b7b300c4240c7
   m_OptimizeCatalogSize: 0
   m_BuildRemoteCatalog: 1
   m_BundleLocalCatalog: 0
@@ -44,8 +44,23 @@ MonoBehaviour:
   m_BuildAddressablesWithPlayerBuild: 0
   m_overridePlayerVersion: '[UnityEditor.PlayerSettings.bundleVersion]'
   m_GroupAssets:
+  - {fileID: 11400000, guid: f060c79f76b1569409287ac1da96980a, type: 2}
+  - {fileID: 11400000, guid: 023d01cc6f87e0d4e953ea9848ff646f, type: 2}
+  - {fileID: 11400000, guid: 7c1ad0220070fdb4385f8e32311ec997, type: 2}
+  - {fileID: 11400000, guid: 79d70e17d11308846b93668a16afc389, type: 2}
+  - {fileID: 11400000, guid: e6e46fc6ce21704479ecce783eb48641, type: 2}
+  - {fileID: 11400000, guid: dd3c5fa4a7e132a4988aec8efada186a, type: 2}
+  - {fileID: 11400000, guid: ba9ca7c5e4fb8ea49ad254642335e9b7, type: 2}
+  - {fileID: 11400000, guid: 0b799cf2f2ff7bd428e1a98929f7728a, type: 2}
+  - {fileID: 11400000, guid: b9e0108eaa9f6d34197c3edb37be7270, type: 2}
   - {fileID: 11400000, guid: 9aec6704b9b790146900d964b25dbd05, type: 2}
-  - {fileID: 11400000, guid: 50b8b2b4366d85d4c93c62527ed8c74f, type: 2}
+  - {fileID: 11400000, guid: ede6cba6b3395874699db765bf36d4df, type: 2}
+  - {fileID: 11400000, guid: f3971e1fd5772744189b19ed0e8469d6, type: 2}
+  - {fileID: 11400000, guid: ea01dd3721ad6c64085eae9e9587fbcf, type: 2}
+  - {fileID: 11400000, guid: bf4ccbb024e863845af4464c3895917b, type: 2}
+  - {fileID: 11400000, guid: 48db0aaa28af5314d95b094586c40b4f, type: 2}
+  - {fileID: 11400000, guid: 6630d0336836a9a4181b5d6e17520481, type: 2}
+  - {fileID: 11400000, guid: 1c3bbf74fc01358449715417aab42fcf, type: 2}
   m_BuildSettings:
     m_CompileScriptsInVirtualMode: 0
     m_CleanupStreamingAssetsAfterBuilds: 1
@@ -87,14 +102,6 @@ MonoBehaviour:
   m_LabelTable:
     m_LabelNames:
     - default
-    - texture
-    - config
-    - prefabs
-    - assembly
-    - scenes
-    - model
-    - materials
-    - animation
   m_SchemaTemplates: []
   m_GroupTemplateObjects:
   - {fileID: 11400000, guid: 43c9a559090efac4996c4cd880d05aa1, type: 2}

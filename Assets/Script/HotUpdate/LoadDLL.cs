@@ -77,11 +77,11 @@ namespace UG20260527
             }
 
             // 加载程序集
-            TextAsset assemblyBytes = await Addressables.LoadAssetAsync<TextAsset>("Assets/AddressablesAsset/Assembly/StandaloneWindows64/HotUpdate.dll.bytes");
+            TextAsset assemblyBytes = await Addressables.LoadAssetAsync<TextAsset>("Assets/Res_HotUpdate/Assembly/StandaloneWindows64/HotUpdate.dll.bytes");
             Assembly.Load(assemblyBytes.bytes);
 
             // 进入新场景
-            var sceneHandle = Addressables.LoadSceneAsync("Assets/AddressablesAsset/Scenes/InitScene.unity", UnityEngine.SceneManagement.LoadSceneMode.Single, false);
+            var sceneHandle = Addressables.LoadSceneAsync("Assets/Res_HotUpdate/Scenes/InitScene.unity", UnityEngine.SceneManagement.LoadSceneMode.Single, false);
             await sceneHandle.Task;
             if(sceneHandle.Status == AsyncOperationStatus.Succeeded)
             {
