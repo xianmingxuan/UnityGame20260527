@@ -68,10 +68,10 @@ namespace UG20260527
             // 绑定监听
             GetComponentInChildren<Button>("Btn_Setting", out Button comp).onClick.AddListener(() =>
             {
-                
                 // 震动动画
-                if(comp != null)
+                if (comp != null)
                 {
+                    comp.interactable = false;
                     comp.transform.DOShakePosition(1, 10).OnComplete(() =>
                     {
                         // 退出场景
