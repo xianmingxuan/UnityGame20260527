@@ -103,6 +103,7 @@ namespace UG20260527
             GetComponentInChildren<Button>("Btn_Setting", out btn_Setting).onClick.AddListener(() =>
             {
                 Debug.Log($"点击 {GetComponentInChildren<Text>(btn_Setting.gameObject, "Text").text}");
+                Application.Quit();
             });
 
         }
