@@ -76,42 +76,55 @@ namespace UG20260527
                     Debug.Log($"获取 热更新包体Size = {sizeHandle.Result}");
                     if(sizeHandle.Result > 0)
                     {
-                        // 5. 下载 热更新资源
-                        Debug.Log("下载 热更新资源 开始");
-                        var downloadHandle = Addressables.DownloadDependenciesAsync(_updateKeys, Addressables.MergeMode.Union);
-                        
-                        DownloadStatus downloadState;
-                        while (!downloadHandle.IsDone)
+                        // 自动重试（没法验证是否起作用）
+                        int maxRetries = 3;
+                        int retryCount = 0;
+                        while (retryCount < maxRetries)
                         {
-                            // 获取 下载状态
-                            downloadState = downloadHandle.GetDownloadStatus();
-                            // 已经下载的资源字节数
-                            long downloadBytes = downloadState.DownloadedBytes;
-                            // 总的资源字节数
-                            long totalBytes = downloadState.TotalBytes;
-                            Debug.Log($"  下载资源数/总资源数 = {downloadBytes} / {totalBytes}");
+                            // 5. 下载 热更新资源
+                            Debug.Log("下载 热更新资源 开始");
+                            var downloadHandle = Addressables.DownloadDependenciesAsync(_updateKeys, Addressables.MergeMode.Union);
 
-                            // 下载百分比
-                            float percent = downloadState.Percent;
-                            //Debug.Log($"  下载百分比 = {percent * 100}%");
+                            DownloadStatus downloadState;
+                            while (!downloadHandle.IsDone)
+                            {
+                                // 获取 下载状态
+                                downloadState = downloadHandle.GetDownloadStatus();
+                                // 已经下载的资源字节数
+                                long downloadBytes = downloadState.DownloadedBytes;
+                                // 总的资源字节数
+                                long totalBytes = downloadState.TotalBytes;
+                                Debug.Log($"  下载资源数/总资源数 = {downloadBytes} / {totalBytes}");
 
-                            await UniTask.Yield();
+                                // 下载百分比
+                                float percent = downloadState.Percent;
+                                //Debug.Log($"  下载百分比 = {percent * 100}%");
+
+                                await UniTask.Yield();
+                            }
+                            if (downloadHandle.Status == AsyncOperationStatus.Succeeded)
+                            {
+                                Debug.Log("下载 热更新资源包 成功");
+                                break;
+                            }
+                            else
+                            {
+                                Debug.LogWarning("下载 热更新资源包 失败，2秒后重试");
+                                retryCount++;
+                                await UniTask.WaitForSeconds(2);
+                            }
+                            Addressables.Release(downloadHandle);
                         }
-                        if (downloadHandle.Status == AsyncOperationStatus.Succeeded)
-                        {
-                            Debug.Log("下载 热更新资源包 成功");
-                        }
-                        else
-                        {
-                            Debug.Log("下载 热更新资源包 失败");
-                        }
-                        Addressables.Release(downloadHandle);
+                        if (retryCount >= maxRetries) Debug.LogWarning("热更新失败，请检查网络");
                     }
                     Addressables.Release(sizeHandle);
                 }
-                Addressables.Release(catalogHandle);
-
             }
+            else
+            {
+                Debug.LogWarning("网络未连接，无法检查更新");
+            }
+            Addressables.Release(catalogHandle);
 
             // 补充AOT
             LoadAOT();
