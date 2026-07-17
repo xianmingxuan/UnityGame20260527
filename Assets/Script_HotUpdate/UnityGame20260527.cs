@@ -14,6 +14,7 @@ namespace UG20260527
             RegisterSystem<IResourceSystem>(new ResourceSystem());
             RegisterSystem<ISceneSystem>(new SceneSystem());
             RegisterSystem<ISaveGameSystem>(new SaveGameSystem());
+            RegisterSystem<IAudioSystem>(new AudioSystem());
 
             // 数据层
             RegisterModel<IScoreModel>(new ScoreModel());

@@ -4,6 +4,7 @@ using QFramework;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using UnityEngine.UI;
 
 namespace UG20260527
@@ -12,6 +13,11 @@ namespace UG20260527
     {
         // UI
         Button Btn_Setting;
+        Button Btn_Mailbox;
+        Button Btn_Friend;
+
+        AudioClip audioClip;
+        AudioSource audioSource;
 
         // 动画控制器
         private Animator _animator;
@@ -34,7 +40,8 @@ namespace UG20260527
             // 动画控制器
             _animator = GetComponent<Animator>();
             Btn_Setting = GetComponentInChildren<Button>("Btn_Setting");
-
+            Btn_Mailbox = GetComponentInChildren<Button>("Btn_Mailbox");
+            Btn_Friend = GetComponentInChildren<Button>("Btn_Friend");
         }
 
         public override void OnOpen()
@@ -70,7 +77,7 @@ namespace UG20260527
                 if (text_NumberOfRecycledVehicles != null) text_NumberOfRecycledVehicles.text = value.ToString();
             }));
 
-            // 绑定监听
+            // 设置
             Btn_Setting.onClick.AddListener(() =>
             {
                 // 震动动画
@@ -83,6 +90,22 @@ namespace UG20260527
                         this.SendCommand<ExitLatestSceneCommand>();
                     });
                 }
+            });
+
+            // 邮箱
+            Btn_Mailbox.onClick.AddListener(async () =>
+            {
+                // 播放BGM
+                if(audioClip == null) audioClip = await Addressables.LoadAssetAsync<AudioClip>("Assets/Res_HotUpdate/Audio/BGM1.wav");
+                if(audioSource == null) audioSource = this.GetSystem<IAudioSystem>().Play2D(audioClip);
+                else this.GetSystem<IAudioSystem>().Stop2D(ref audioSource);
+            });
+
+            // 好友
+            Btn_Friend.onClick.AddListener(async () =>
+            {
+                var c = await Addressables.LoadAssetAsync<AudioClip>("Assets/Res_HotUpdate/Audio/UI.wav");
+                this.GetSystem<IAudioSystem>().Play2DOneShot(c);
             });
         }
 
@@ -98,6 +121,15 @@ namespace UG20260527
 
             Btn_Setting.onClick.RemoveAllListeners();
             Btn_Setting.interactable = true;
+            Btn_Mailbox.onClick.RemoveAllListeners();
+            Btn_Friend.onClick.RemoveAllListeners();
+
+            audioClip = null;
+            if (audioSource != null)
+            {
+                this.GetSystem<IAudioSystem>().Stop2D(ref audioSource);
+                audioSource = null;
+            }
         }
 
 
