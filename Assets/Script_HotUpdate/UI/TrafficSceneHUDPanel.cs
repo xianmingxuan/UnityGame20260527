@@ -16,8 +16,7 @@ namespace UG20260527
         Button Btn_Mailbox;
         Button Btn_Friend;
 
-        AudioClip audioClip;
-        AudioSource audioSource;
+        bool _isBGM = false;
 
         // 动画控制器
         private Animator _animator;
@@ -65,16 +64,24 @@ namespace UG20260527
                 if(text_HP != null) text_HP.text = value.ToString();
             }));
 
+            // 车辆总数
             unRegisters.Add(_gameModel.numberOfVehicles.RegisterWithInitValue(value =>
             {
                 var text_NumberOfVehicles = GetComponentInChildren<Text>("Text_NumberOfVehicles");
                 if (text_NumberOfVehicles != null) text_NumberOfVehicles.text = value.ToString();
             }));
 
+            // 已回收的车辆数
             unRegisters.Add(_gameModel.numberOfRecycledVehicles.RegisterWithInitValue(value =>
             {
                 var text_NumberOfRecycledVehicles = GetComponentInChildren<Text>("Text_NumberOfRecycledVehicles");
                 if (text_NumberOfRecycledVehicles != null) text_NumberOfRecycledVehicles.text = value.ToString();
+                // 退出场景
+                if (value >= _gameModel.numberOfVehicles.Value)
+                {
+                    this.GetSystem<IAudioSystem>().PlayOneShot2D("Assets/Res_HotUpdate/Audio/ToolFinish1.wav");
+                    this.SendCommand<ExitLatestSceneCommand>();
+                }
             }));
 
             // 设置
@@ -96,16 +103,14 @@ namespace UG20260527
             Btn_Mailbox.onClick.AddListener(async () =>
             {
                 // 播放BGM
-                if(audioClip == null) audioClip = await Addressables.LoadAssetAsync<AudioClip>("Assets/Res_HotUpdate/Audio/BGM1.wav");
-                if(audioSource == null) audioSource = this.GetSystem<IAudioSystem>().Play2D(audioClip);
-                else this.GetSystem<IAudioSystem>().Stop2D(ref audioSource);
+                if(!_isBGM) _isBGM = await this.GetSystem<IAudioSystem>().Play2D("Assets/Res_HotUpdate/Audio/BGM1.wav");
+                else _isBGM = !this.GetSystem<IAudioSystem>().Stop2D("Assets/Res_HotUpdate/Audio/BGM1.wav");
             });
 
             // 好友
-            Btn_Friend.onClick.AddListener(async () =>
+            Btn_Friend.onClick.AddListener(() =>
             {
-                var c = await Addressables.LoadAssetAsync<AudioClip>("Assets/Res_HotUpdate/Audio/UI.wav");
-                this.GetSystem<IAudioSystem>().Play2DOneShot(c);
+                this.GetSystem<IAudioSystem>().PlayOneShot2D("Assets/Res_HotUpdate/Audio/UI.wav");
             });
         }
 
@@ -124,12 +129,8 @@ namespace UG20260527
             Btn_Mailbox.onClick.RemoveAllListeners();
             Btn_Friend.onClick.RemoveAllListeners();
 
-            audioClip = null;
-            if (audioSource != null)
-            {
-                this.GetSystem<IAudioSystem>().Stop2D(ref audioSource);
-                audioSource = null;
-            }
+            if (_isBGM) this.GetSystem<IAudioSystem>().Stop2D("Assets/Res_HotUpdate/Audio/BGM1.wav");
+            _isBGM = false;
         }
 
 

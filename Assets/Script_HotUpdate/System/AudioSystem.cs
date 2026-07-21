@@ -3,6 +3,7 @@ using QFramework;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 
 namespace UG20260527
 {
@@ -85,20 +86,20 @@ namespace UG20260527
         /// </summary>
         /// <param name="audioClip"></param>
         /// <returns></returns>
-        public AudioSource Play2D(AudioClip audioClip);
+        public UniTask<bool> Play2D(string audioClipPath);
         /// <summary>
         /// 停止播放2D音频，并回收AudioSource
         /// </summary>
         /// <param name="audioSource"></param>
         /// <returns></returns>
-        public bool Stop2D(ref AudioSource audioSource);
+        public bool Stop2D(string audioClipPath);
         /// <summary>
         /// 播放短时2D音效（如UI）
         /// </summary>
         /// <param name="audioClip"></param>
         /// <param name="complete"></param>
         /// <param name="duration"></param>
-        public void Play2DOneShot(AudioClip audioClip, Action complete = null, float duration = -1f);
+        public UniTask<bool> PlayOneShot2D(string audioClipPath, float duration = -1f);
 
     }
 
@@ -109,10 +110,14 @@ namespace UG20260527
 
         // 2D音频源gameObject载体（用于 统一挂载2DAudioSource）（2d音频源不需要挂载到具体的发声物上，所以统一挂载到指定gameObject，方便管理）
         private GameObject _2DAduioSourceRoot;
-        // 2D音频源（正在播放）
-        private List<AudioSource> _2dAudioSource = new List<AudioSource>();
         // AudioSource管理工具
         private AudioSourcePoolTool _2dAudioSourcePool;
+
+        // 字典 addressableKey -> 音频源组件（脚本）
+        private Dictionary<string, List<AudioSource>> _audioSourceDict = new Dictionary<string, List<AudioSource>>();
+        // 字典
+        private Dictionary<string, AudioClip> _audioClipDict = new Dictionary<string, AudioClip>();
+
 
 
         protected override void OnInit()
@@ -128,15 +133,30 @@ namespace UG20260527
         /// </summary>
         /// <param name="audioClip"></param>
         /// <returns></returns>
-        public AudioSource Play2D(AudioClip audioClip)
+        public async UniTask<bool> Play2D(string audioClipPath)
         {
-            if (audioClip == null) return null;
+            if (String.IsNullOrEmpty(audioClipPath)) return false;
 
+            // 获取 音频片段
+            AudioClip audioClip = null;
+            if (_audioClipDict.ContainsKey(audioClipPath)) audioClip = _audioClipDict[audioClipPath];
+            else audioClip = await Addressables.LoadAssetAsync<AudioClip>(audioClipPath);
+            if(audioClip == null)
+            {
+                Debug.LogWarning($"获取不到AudioClip {audioClipPath}");
+                return false;
+            }
+
+            // 获取 2D音频源
             AudioSource source = _2dAudioSourcePool.Get();
             source.clip = audioClip;
             source.Play();
 
-            _2dAudioSource.Add(source);
+            // 记录 音频片段字典
+            _audioClipDict.Add(audioClipPath, audioClip);
+            // 记录 音频源字典
+            if (!_audioSourceDict.ContainsKey(audioClipPath)) _audioSourceDict.Add(audioClipPath, new List<AudioSource>());
+            _audioSourceDict[audioClipPath].Add(source);
 
             return source;
         }
@@ -146,15 +166,36 @@ namespace UG20260527
         /// </summary>
         /// <param name="audioSource"></param>
         /// <returns></returns>
-        public bool Stop2D(ref AudioSource audioSource)
+        public bool Stop2D(string audioClipPath)
         {
-            if(audioSource == null) return false;
-            
-            if(_2dAudioSource.Contains(audioSource)) _2dAudioSource.Remove(audioSource);
+            if(String.IsNullOrEmpty(audioClipPath)) return false;
 
+            // 获取 音频片段
+            if (!_audioClipDict.ContainsKey(audioClipPath))
+            {
+                Debug.LogWarning($"音频片段 {audioClipPath} 不受音频管理器控制");
+                return false;
+            }
+            AudioClip audioClip = _audioClipDict[audioClipPath];
+
+            // 获取 字典音频源
+            if (!_audioSourceDict.ContainsKey(audioClipPath) || _audioSourceDict[audioClipPath].Count <= 0)
+            {
+                Debug.LogWarning($"音频源 {audioClipPath} 不受音频管理器控制");
+                // 移除 音频片段字典
+                _audioClipDict.Remove(audioClipPath);
+                return false;
+            }
+            AudioSource audioSource = _audioSourceDict[audioClipPath][0];
+
+            // 回收 2D音频源
             audioSource.Stop();
             _2dAudioSourcePool.Recycle(audioSource);
-            audioSource = null;
+
+            // 移除 音频源字典
+            _audioSourceDict[audioClipPath].RemoveAt(0);
+            // 移除 音频片段字典
+            if(_audioSourceDict[audioClipPath].Count <= 0) _audioClipDict.Remove(audioClipPath);
 
             return true;
         }
@@ -165,13 +206,27 @@ namespace UG20260527
         /// <param name="audioClip"></param>
         /// <param name="complete"></param>
         /// <param name="duration"></param>
-        public async void Play2DOneShot(AudioClip audioClip, Action complete = null, float duration = -1f)
+        public async UniTask<bool> PlayOneShot2D(string audioClipPath, float duration = -1f)
         {
-            if(audioClip == null) return;
+            if(String.IsNullOrEmpty(audioClipPath)) return false;
+
+            // 获取 音频片段
+            AudioClip audioClip = null;
+            if (_audioClipDict.ContainsKey(audioClipPath)) audioClip = _audioClipDict[audioClipPath];
+            else audioClip = await Addressables.LoadAssetAsync<AudioClip>(audioClipPath);
+            if (audioClip == null)
+            {
+                Debug.LogWarning($"获取不到AudioClip {audioClipPath}");
+                return false;
+            }
+
+            // 获取 2D音频源
             AudioSource source = _2dAudioSourcePool.Get();
             source.clip = audioClip;
             source.loop = false;
             source.Play();
+
+            // 等待返回
             if (duration == -1f)
             {
                 await UniTask.WaitUntil(() =>
@@ -183,8 +238,8 @@ namespace UG20260527
                 {
                     source.Stop();
                     _2dAudioSourcePool.Recycle(source);
+                    return true;
                 }
-                complete?.Invoke();
             }
             else
             {
@@ -193,9 +248,10 @@ namespace UG20260527
                 {
                     source.Stop();
                     _2dAudioSourcePool.Recycle(source);
+                    return true;
                 }
-                complete?.Invoke();
             }
+            return false;
         }
 
 

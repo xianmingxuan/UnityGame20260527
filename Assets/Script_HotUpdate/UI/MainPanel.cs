@@ -135,6 +135,11 @@ namespace UG20260527
             if (panel_Bag) sys.CloseSinglePanel(PanelLayer.NormalLayer, new ClosePanelSetting { panelShouldClose = panel_Bag });
             panel_Bag = null;
 
+            GetComponentInChildren<Toggle>("Toggle_BeginPlay")?.onValueChanged.RemoveAllListeners();
+            GetComponentInChildren<Toggle>("Toggle_Bag")?.onValueChanged.RemoveAllListeners();
+            GetComponentInChildren<Button>("Btn_Portrait")?.onClick.RemoveAllListeners();
+            GetComponentInChildren<Button>("Btn_Setting")?.onClick.RemoveAllListeners();
+
             base.OnClose();
         }
 
